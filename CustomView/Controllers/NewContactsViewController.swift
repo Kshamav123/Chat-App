@@ -57,7 +57,7 @@ class NewContactsViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         tableView.frame = view.bounds
-        noResultsLabel.frame = CGRect(x: view.frame.width/4, y: (view.frame.height-200)/2, width: view.frame.width/2, height: 200)
+        noResultsLabel.frame = CGRect(x: view.frame.width/4, y: (view.frame.height-200)/4, width: view.frame.width/2, height: 200)
     }
     
         @objc func tapCancelButton() {

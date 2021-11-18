@@ -16,9 +16,29 @@ class ConversationCell: UICollectionViewCell {
         configure()
     }
     
+    override func layoutSubviews() {
+        checkBox.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+        checkBox.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
+        checkBox.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        checkBox.widthAnchor.constraint(equalToConstant: 20).isActive = true
+        
+        imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+        imageView.leftAnchor.constraint(equalTo: checkBox.rightAnchor).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        lable1.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        lable1.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 15).isActive = true
+        
+        lable2.topAnchor.constraint(equalTo: lable1.bottomAnchor, constant: 5).isActive = true
+        lable2.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 15).isActive = true
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    let checkBox = CircularCheckBox(frame: CGRect(x: 20, y: 30, width: 20, height: 20))
     
     var imageView : UIImageView = {
         let images = UIImageView()
@@ -49,30 +69,36 @@ class ConversationCell: UICollectionViewCell {
         return label
     }()
     
+
     
     func configure() {
         
-        
-        addSubview(lable1)
-        addSubview(lable2)
-        addSubview(imageView)
+        contentView.addSubview(lable1)
+        contentView.addSubview(lable2)
+        contentView.addSubview(imageView)
+        contentView.addSubview(checkBox)
+//        addSubview(checkBox)
+//        addSubview(lable1)
+//        addSubview(lable2)
+//        addSubview(imageView)
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         lable1.translatesAutoresizingMaskIntoConstraints = false
         lable2.translatesAutoresizingMaskIntoConstraints = false
+        checkBox.translatesAutoresizingMaskIntoConstraints = false
         
         
-        
-        NSLayoutConstraint.activate([
+//        NSLayoutConstraint.activate([
             
-            imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            imageView.rightAnchor.constraint(equalTo: rightAnchor, constant: -10),
+//            imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+//            imageView.leftAnchor.constraint(equalTo: lable1.rightAnchor, constant: -10),
+//          checkBox.rightAnchor.constraint(equalTo: stack.leftAnchor,constant: 5)
 //            imageView.heightAnchor.constraint(equalToConstant: 30),
-//            imageView.widthAnchor.constraint(equalToConstant: 30)
-            
-
+//            imageView.widthAnchor.constraint(equalToConstant: 30),
+//
+//
 //            lable1.topAnchor.constraint(equalTo: self.topAnchor, constant: 20),
-//            lable1.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 20),
+//            lable1.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 20),
 //            lable1.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -20),
 //            lable1.heightAnchor.constraint(equalToConstant: 50),
 //
@@ -80,14 +106,13 @@ class ConversationCell: UICollectionViewCell {
 //            lable2.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
 //            lable2.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
 //            lable2.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -20),
-            ])
+//            ])
         
-        let stack = UIStackView(arrangedSubviews: [imageView,lable1,lable2])
-        stack.axis = .vertical
-        stack.spacing = 3
-        addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-//        stack.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 5).isActive = true
+//        let stack = UIStackView(arrangedSubviews: [imageView,lable1,lable2])
+//        stack.axis = .vertical
+//        stack.spacing = 3
+//        addSubview(stack)
+//        stack.translatesAutoresizingMaskIntoConstraints = false
+//        stack.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
     }
 }

@@ -22,6 +22,11 @@ class ProfileViewController: UIViewController {
         tableView.tableHeaderView = createTableHeader()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        tableView.tableHeaderView = createTableHeader()
+    }
+    
     func createTableHeader() -> UIView? {
         guard let email = UserDefaults.standard.value(forKey: "email") as? String  else {
             return nil
@@ -32,7 +37,7 @@ class ProfileViewController: UIViewController {
         
         let path = "images/"+filename
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 300))
-        headerView.backgroundColor = .link
+        headerView.backgroundColor = .green
         
         let imageView = UIImageView(frame: CGRect(x: (headerView.frame.width-150)/2, y: 75, width: 150, height: 150))
         imageView.contentMode = .scaleAspectFit
