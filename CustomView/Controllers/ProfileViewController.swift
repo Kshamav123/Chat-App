@@ -12,6 +12,8 @@ class ProfileViewController: UIViewController {
 
     @IBOutlet var tableView: UITableView!
     
+    var imageView: UIImageView!
+    
     let content = ["Logout"]
     
     override func viewDidLoad() {
@@ -20,26 +22,28 @@ class ProfileViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = createTableHeader()
+        fetchuser()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         tableView.tableHeaderView = createTableHeader()
+        fetchuser()
     }
     
     func createTableHeader() -> UIView? {
-        guard let email = UserDefaults.standard.value(forKey: "email") as? String  else {
-            return nil
-        }
-        
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        let filename = safeEmail + "_profile_picture.png"
-        
-        let path = "images/"+filename
+//        guard let email = UserDefaults.standard.value(forKey: "email") as? String  else {
+//            return nil
+//        }
+//
+//        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+//        let filename = safeEmail + "_profile_picture.png"
+//
+//        let path = "images/"+filename
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 300))
         headerView.backgroundColor = .green
         
-        let imageView = UIImageView(frame: CGRect(x: (headerView.frame.width-150)/2, y: 75, width: 150, height: 150))
+        imageView = UIImageView(frame: CGRect(x: (headerView.frame.width-150)/2, y: 75, width: 150, height: 150))
         imageView.contentMode = .scaleAspectFit
         imageView.backgroundColor = .white
         imageView.layer.borderColor = UIColor.white.cgColor
@@ -48,18 +52,31 @@ class ProfileViewController: UIViewController {
         imageView.layer.masksToBounds = true
         headerView.addSubview(imageView)
         
-        StorageManager.shared.downloadURL(for: path, completion: { [weak self] result in
-            switch result {
-            case .success(let url):
-                print("XXXXXXXXXXXXXXXXXXXXXXXx")
-                self?.downloadImage(imageView: imageView, url: url)
-            case .failure(let error):
-                print("failed to get download url: \(error)")
-            }
-            
-        })
+//        StorageManager.shared.downloadURL(for: path, completion: { [weak self] result in
+//            switch result {
+//            case .success(let url):
+//                print("XXXXXXXXXXXXXXXXXXXXXXXx")
+//                self?.downloadImage(imageView: imageView, url: url)
+//            case .failure(let error):
+//                print("failed to get download url: \(error)")
+//            }
+//
+//        })
         
        return headerView
+    }
+    
+    func fetchuser(){
+        
+        let uid = Auth.auth().currentUser?.uid
+        print( "Profile/\(uid)")
+        StorageManager.shared.downloadImageWithPath(path: "Profile/\(uid!)") { image in
+            print("((((((((((((((((((((((((((")
+            DispatchQueue.main.async {
+                self.imageView.image = image
+                
+            }
+        }
     }
     
     func downloadImage(imageView: UIImageView, url: URL) {
@@ -93,16 +110,16 @@ extension ProfileViewController:UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         
         do {
-          try FirebaseAuth.Auth.auth().signOut()
-            let vc = LoginViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .fullScreen
-            present(nav, animated: true, completion: nil)
-            showAlert(title: "Logout", message: "Are you sure you want to logout")
+            let isLoggedOut = DatabaseManager.shared.onLogout()
+            if isLoggedOut {
+                let vc = LoginViewController()
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .fullScreen
+                present(nav, animated: true, completion: nil)
+            }
+
         }
-        catch {
          
         }
     }
     
-}

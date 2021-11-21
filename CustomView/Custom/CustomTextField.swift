@@ -18,8 +18,8 @@ class CustomTextField: UITextField {
         autocorrectionType = .no
         textColor = .black
         backgroundColor = .white
-        layer.cornerRadius = 10
-        layer.borderColor = UIColor.darkGray.cgColor
+//        layer.cornerRadius = 10
+//        layer.borderColor = UIColor.darkGray.cgColor
 //        layer.borderWidth = 2
         self.placeholder = placeholder
     }

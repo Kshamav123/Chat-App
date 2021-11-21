@@ -11,6 +11,7 @@ import FirebaseAuth
 class LoginViewController: UIViewController {
     
     //MARK: Properties
+    var delegate : UserAuthenticatedDelegate?
     
     let label : UILabel = {
         
@@ -122,6 +123,7 @@ class LoginViewController: UIViewController {
             }
             let user = result.user
             UserDefaults.standard.set(email, forKey: "email")
+            self!.delegate?.UserAuthenticated()
             strongSelf.navigationController?.dismiss(animated: true, completion: nil)
             
         })
@@ -130,9 +132,12 @@ class LoginViewController: UIViewController {
     @objc func didTapRegister() {
         
         let vc = RegistrationViewController()
+        vc.delegate = delegate
         vc.title = "Create Account"
         //        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
-        navigationController?.pushViewController(vc, animated: true)
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true, completion: nil)
+//        navigationController?.pushViewController(vc, animated: true)
     }
     
 }

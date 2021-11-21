@@ -12,6 +12,7 @@ class RegistrationViewController: UIViewController {
     
     //MARK: Properties
     
+    var delegate : UserAuthenticatedDelegate?
     let photButton : UIImageView = {
         
         let imageView = UIImageView()
@@ -83,53 +84,61 @@ class RegistrationViewController: UIViewController {
         guard let firstName = firstNameTextField.text,
               let lastName = lastNameTextField.text,
               let email = emailTextField.text,
-              let password = passwordTextField.text,!firstName.isEmpty,!lastName.isEmpty, !email.isEmpty, !password.isEmpty else {
-                  showAlert(title: "Error", message: "Enter all the fields")
+              let profilePic = photButton.image,
+              let password = passwordTextField.text, !firstName.isEmpty,!lastName.isEmpty, !email.isEmpty, !password.isEmpty else {
+                  self.showAlert(title: "Error", message: "Enter all the fields")
                   return
               }
-        DatabaseManager.shared.userExists(with: email, completion: { [weak self] exists in
+        DatabaseManager.shared.userExists(with: email) { exists in
             
-            guard let strongSelf = self else {
-                return
-            }
             guard !exists else {
-                strongSelf.showAlert(title: "Exists", message: "Account for the email address already exists")
+                self.showAlert(title: "Exists", message: "Account for the email address already exists")
                 return
             }
+        }
             
-            FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password, completion: {  authResult, error in
+        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) {  [weak self] authResult, error in
                 
-                guard authResult != nil, error == nil else {
-                    return
+//                guard authResult != nil, error == nil else {
+//                    self?.showAlert(title: "Error", message: "Error in creating user")
+//                    print(authResult)
+//                    return
+//                }
+//                let uid = authResult?.user.uid
+////                let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email)
+////                DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
+//            StorageManager.ImageUploader.uploadImage(image: profilePic, uid: uid!) { url in
+//                    let newUser = UserData(username: firstName + lastName, email: email, profileURL: url, uid: uid!)
+//                    DatabaseManager.shared.addUser(user: newUser)
+//                    self?.dismiss(animated: true)
+//
+//
+//
+//            self?.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
+//
+//
+//                }
+            guard let self = self else {return}
+            
+            if error != nil {
+                self.showAlert(title: "Error", message: error!.localizedDescription)
+                return
+            }
+            if let authResult = authResult{
+                let uid = authResult.user.uid
+                
+                StorageManager.ImageUploader.uploadImage(image: profilePic, uid: uid) { url in
+                    
+                    let newuser = UserData(username: firstName + lastName, email: email, profileURL: url, uid: uid)
+                    DatabaseManager.shared.addUser(user: newuser)
+                    self.delegate?.UserAuthenticated() 
+                    self.dismiss(animated: true, completion: nil)
                 }
-                let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email)
-                DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
-                    if success{
-                        //upload image
-                        guard let image = strongSelf.photButton.image, let data = image.pngData() else {
-                            return
-                        }
-                        let filename = chatUser.profilePictureFileName
-                        StorageManager.shared.uploadProfilePicture(with: data ,fileName: filename, completion: {result in
-                            switch result {
-                                
-                            case .success(let downloadUrl):
-                                UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
-                                print(downloadUrl)
-                            case .failure(let error):
-                                print("Storage manager error:\(error)")
-                            }
-                        })
-                    }
-                })
-                
-                strongSelf.navigationController?.dismiss(animated: true, completion: nil)
-                
-            })
-            
-        })
-        
+                self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
+            }
+            }
     }
+
     
     @objc func keyboardWillShow(){
         print("Keybaord will show")

@@ -7,12 +7,15 @@
 
 import UIKit
 import FirebaseAuth
-//let reuseIdentifier: "cell"
+
 class ViewController: UIViewController {
     
-    var list = ["",""]
+    var chats: [Chats] = []
+    var currentUser: UserData?
     var collectionView: UICollectionView!
     var tapped :Bool = false
+    var initialFetch: Bool = false
+    var uid : String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,13 +23,15 @@ class ViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(tapEdit))
         navigationController?.navigationBar.tintColor = UIColor.blue
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
-        configureNavigationBar()
-        configureUICollectionView()
+        //        configureNavigationBar()
+        //        configureUICollectionView()
+        //        fetchData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        validateAuth()
+//        validateAuth()
+        isLoggedIn()
     }
     
     @objc func tapEdit() {
@@ -35,9 +40,24 @@ class ViewController: UIViewController {
         collectionView.reloadData()
     }
     
+    func isLoggedIn() {
+        if FirebaseAuth.Auth.auth().currentUser == nil {
+            DispatchQueue.main.async {
+                let vc = LoginViewController()
+                vc.delegate = self
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: true)
+            }
+        } else {
+            configureNavigationBar()
+            configureUICollectionView()
+            fetchData()
+        }
+    }
+    
     func configureNavigationBar() {
         
-//        view.backgroundColor = .white
+        //        view.backgroundColor = .white
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -51,9 +71,10 @@ class ViewController: UIViewController {
     }
     
     func configureUICollectionView() {
+        uid = Auth.auth().currentUser?.uid
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
-//        collectionView.backgroundColor = .black
+        //        collectionView.backgroundColor = .black
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(ConversationCell.self, forCellWithReuseIdentifier: "cell")
@@ -72,10 +93,29 @@ class ViewController: UIViewController {
         
     }
     
+    func fetchData() {
+        
+        DatabaseManager.shared.fetchUser(uid: uid!) { currentUser in
+            
+            self.currentUser = currentUser
+        }
+        
+        DatabaseManager.shared.fetchChats(uid: uid!) { chats in
+            self.chats = chats
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
+        }
+        
+    }
+    
     @objc func didTapNewContacts() {
         
+        
         let vc = NewContactsViewController()
+        vc.currentUser = currentUser
         let nav = UINavigationController(rootViewController: vc)
+        vc.chats = chats
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true, completion: nil)
     }
@@ -88,15 +128,47 @@ extension ViewController : UICollectionViewDelegate {
 
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2
+        return chats.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ConversationCell
         cell.backgroundColor = .white
-        cell.checkBox.checked = !tapped
-        cell.checkBox.checking()
+        let chat = chats[indexPath.row]
+        let otherUser = chat.users[chat.otherUser!]
+        cell.animateCell(show: tapped)
+        cell.lable1.text = otherUser.username
+        cell.lable2.text = chat.lastMessage?.message
+        
+        let formattedDate = DateFormatter()
+        formattedDate.dateFormat = "hh:mm"
+        
+        //        var fetchUser: UserData
+        
+        if chat.lastMessage == nil {
+            cell.timelable.isHidden = true
+        } else {
+            //            fetchUser = chat.users[1]
+            cell.timelable.isHidden = false
+            cell.timelable.text = formattedDate.string(from: chat.lastMessage!.time)
+        }
+        
+        StorageManager.shared.downloadImageWithPath(path: "Profile/\(otherUser.uid)") { image in
+            cell.imageView.image = image
+        }
+        
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        let user = chats[indexPath.row]
+        let vc = ChatViewController()
+        vc.currentUser = currentUser
+        vc.chat = chats[indexPath.row]
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
+        //        present(vc, animated: true, completion: nil)
     }
 }
 
@@ -111,12 +183,16 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
         return 10
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        
-        return UIEdgeInsets(top: 20.0, left: 1.0, bottom: 1.0, right: 1.0)
-    }
-    
 }
 
 
-
+extension ViewController: UserAuthenticatedDelegate {
+    func UserAuthenticated() {
+        configureNavigationBar()
+        configureUICollectionView()
+        fetchData()
+    }
+    
+    
+    
+}
