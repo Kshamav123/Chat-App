@@ -27,10 +27,12 @@ class LoginViewController: UIViewController {
     }()
     
     
-    var emailTextField = CustomTextField(placeholder: "  Email")
-    var passwordTextField = CustomTextField(placeholder: "  Password")
-    var signUpButton1 = CustomButton(setTitle: "Sign Up")
-    var loginButton1 = CustomButton(setTitle: "Login")
+    var emailTextField = CustomTextField(placeholder: Placeholder.email)
+    var passwordTextField = CustomTextField(placeholder: Placeholder.password)
+//    var signUpButton1 = CustomButton(setTitle: "Sign Up")
+    var signUpButton1 = ButtonSetTitle.signUp
+    var loginButton1 = ButtonSetTitle.login
+//    var loginButton1 = CustomButton(setTitle: "Login")
     
     lazy var emailContainerView : InputContainerView = {
         emailTextField.keyboardType = .emailAddress
@@ -55,7 +57,6 @@ class LoginViewController: UIViewController {
         
         navigationItem.title = "Login"
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
-//        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 30)]
         configure()
         //        createDismissKeyboardTapGesture()
         //        configureNotificationObserver()
@@ -91,6 +92,19 @@ class LoginViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
     }
     
+    func validateFields() -> String? {
+        
+        if Validation.isEmailValid(emailTextField.text!) == false {
+//            showAlert(title: "Error", message: "Please enter proper email")
+            return "Please enter proper email"
+        }
+        if Validation.isPasswordValid(passwordTextField.text!) == false {
+//            showAlert(title: "Error", message: "Please anter the password properly")
+            return "Please enter proper password"
+        }
+        return nil
+    }
+    
     //MARK: Actions
     
     @objc func keyboardWillShow(){
@@ -109,6 +123,11 @@ class LoginViewController: UIViewController {
     
     @objc func handleLogin() {
         
+        let error = validateFields()
+        if error != nil {
+            showAlert(title: "Error", message: error!)
+            return
+        }else {
         guard let email = emailTextField.text, let password = passwordTextField.text, !email.isEmpty, !password.isEmpty else {
             showAlert(title: "Error", message: "Please enter all the fields to login")
             return
@@ -124,10 +143,12 @@ class LoginViewController: UIViewController {
             let user = result.user
             UserDefaults.standard.set(email, forKey: "email")
             self!.delegate?.UserAuthenticated()
-            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+//            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+            self!.dismiss(animated: true, completion: nil)
             
         })
     }
+}
     
     @objc func didTapRegister() {
         

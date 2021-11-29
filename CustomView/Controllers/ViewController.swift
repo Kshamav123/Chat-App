@@ -71,6 +71,7 @@ class ViewController: UIViewController {
     }
     
     func configureUICollectionView() {
+        
         uid = Auth.auth().currentUser?.uid
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
@@ -95,6 +96,10 @@ class ViewController: UIViewController {
     
     func fetchData() {
         
+        chats = []
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm:a"
+        
         DatabaseManager.shared.fetchUser(uid: uid!) { currentUser in
             
             self.currentUser = currentUser
@@ -118,6 +123,7 @@ class ViewController: UIViewController {
         vc.chats = chats
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true, completion: nil)
+//        navigationController?.pushViewController(nav, animated: true)
     }
 }
 
@@ -127,6 +133,7 @@ extension ViewController : UICollectionViewDelegate {
 }
 
 extension ViewController: UICollectionViewDataSource {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return chats.count
     }
@@ -141,17 +148,16 @@ extension ViewController: UICollectionViewDataSource {
         cell.lable2.text = chat.lastMessage?.message
         
         let formattedDate = DateFormatter()
-        formattedDate.dateFormat = "hh:mm"
-        
-        //        var fetchUser: UserData
-        
+        formattedDate.dateFormat = "hh:mm:a"
+
         if chat.lastMessage == nil {
             cell.timelable.isHidden = true
         } else {
-            //            fetchUser = chat.users[1]
+            
             cell.timelable.isHidden = false
             cell.timelable.text = formattedDate.string(from: chat.lastMessage!.time)
         }
+        
         
         StorageManager.shared.downloadImageWithPath(path: "Profile/\(otherUser.uid)") { image in
             cell.imageView.image = image
@@ -162,10 +168,11 @@ extension ViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let user = chats[indexPath.row]
+//        let user = chats[indexPath.row]
         let vc = ChatViewController()
         vc.currentUser = currentUser
         vc.chat = chats[indexPath.row]
+        vc.hidesBottomBarWhenPushed = true
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
         //        present(vc, animated: true, completion: nil)

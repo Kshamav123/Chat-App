@@ -14,11 +14,6 @@ class DatabaseManager {
     static let shared = DatabaseManager()
     let database =  Database.database().reference()
     
-//    static func safeEmail(emailAddress: String) -> String {
-//        var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
-//        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
-//        return safeEmail
-//    }
     
     let databaseDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -47,15 +42,12 @@ class DatabaseManager {
                database.child("Users").child(user.uid).setValue(user.dictionary)
            }
     
-//    enum DatabaseError: Error {
-//        case failedToFetch
-//    }
+
     
     func fetchUser(uid: String, completion: @escaping(UserData) -> Void) {
            database.child("Users").child(uid).observe(.value) { snapshot in
                if let dictionary = snapshot.value as? [String: Any] {
                    
-   //                print(dictionary)
                    let email = dictionary["email"] as! String
                    let username = dictionary["username"] as! String
                    let profileURL = dictionary["profileURL"] as! String
@@ -133,21 +125,9 @@ class DatabaseManager {
                            
                            let users = value["users"] as! [[String: Any]]
                            let lastMessageDictionary = value["lastMessage"] as? [String: Any]
-                           let messagesDictionary = value["messagesArray"] as? [[String: Any]]
+//                           let messagesDictionary = value["messagesArray"] as? [[String: Any]]
        //                    print(users)
                            if lastMessageDictionary != nil {
-                               for messageItem in messagesDictionary! {
-                                   let sender = messageItem["sender"] as! String
-                                   let message = messageItem["message"] as! String
-                                   let timeString = messageItem["time"] as! String
-                                   let seen = messageItem["seen"] as! Bool
-                                   
-                                   let time = self.databaseDateFormatter.date(from: timeString)
-                                   
-                                   let currentMessage = Message(sender: sender, message: message, time: time!, seen: seen)
-                                   
-                                   messagesArray.append(currentMessage)
-                               }
                                
                                let sender = lastMessageDictionary!["sender"] as! String
                                let message = lastMessageDictionary!["message"] as! String
@@ -188,7 +168,7 @@ class DatabaseManager {
                                otherUser = 0
                            }
                            let id = key
-                           let chat = Chats(users: [firstUser, secondUser], lastMessage: lastMessage, messages: messagesArray, otherUser: otherUser, chatId: id)
+                           let chat = Chats(users: [firstUser, secondUser], lastMessage: lastMessage, messages: [], otherUser: otherUser, chatId: id)
                            
                            if firstUser.uid == uid || secondUser.uid == uid {
                                chats.append(chat)
@@ -202,6 +182,7 @@ class DatabaseManager {
                    }
                }
            }
+    
     func fetchMessages(chatId: String, completion: @escaping([Message]) -> Void) {
         
            database.child("Chats").child("\(chatId)/messagesArray").observe(.value) { snapshot in
@@ -220,6 +201,7 @@ class DatabaseManager {
        }
     
     func createMessageObject(dictionary: [String: Any]) -> Message {
+        
              let sender = dictionary["sender"] as! String
              let message = dictionary["message"] as! String
              let timeString = dictionary["time"] as! String
@@ -230,7 +212,7 @@ class DatabaseManager {
              return Message(sender: sender, message: message, time: time!, seen: seen)
          }
     
-    func addMessage(chat: Chats, id: String) {
+    func addMessage(chat: Chats, id: String, messageContent: [Message]) {
                
                var currentChat = chat
                
@@ -240,7 +222,7 @@ class DatabaseManager {
                let lastMessageDictionary = currentChat.lastMessage?.dictionary
                var messagesDictionary: [[String: Any]] = []
                
-        for var message in currentChat.messages! {
+        for var message in messageContent {
                    let dateString = databaseDateFormatter.string(from: message.time)
                    message.dateString = dateString
                    messagesDictionary.append(message.dictionary)

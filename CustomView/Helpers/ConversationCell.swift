@@ -24,11 +24,11 @@ class ConversationCell: UICollectionViewCell {
         selectButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
         
         imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        imageView.leftAnchor.constraint(equalTo: selectButton.rightAnchor,constant: 5).isActive = true
+        imageView.leftAnchor.constraint(equalTo: selectButton.rightAnchor,constant: 20).isActive = true
         imageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         imageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
         
-        lable1.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        lable1.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 23).isActive = true
         lable1.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 15).isActive = true
         
         lable2.topAnchor.constraint(equalTo: lable1.bottomAnchor, constant: 5).isActive = true
@@ -41,8 +41,6 @@ class ConversationCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-
     
     var select : Bool = false
     
@@ -60,9 +58,9 @@ class ConversationCell: UICollectionViewCell {
         let images = UIImageView()
         images.contentMode = .scaleAspectFit
         images.image = UIImage(systemName: "person.fill")
-        images.layer.cornerRadius = 5
+        images.layer.cornerRadius = 20
+//        images.backgroundColor = .blue
         images.clipsToBounds = true
-//        images.backgroundColor = .darkGray
         return images
         
        
@@ -70,26 +68,23 @@ class ConversationCell: UICollectionViewCell {
     
     var lable1: UILabel = {
         let label = UILabel()
-//        label.text = "abcdfadsfd"
-        label.textColor = .brown
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.textColor = .black
+        label.font = Font.fontBold1
         return label
     }()
     
     var lable2: UILabel = {
         let label = UILabel()
-//        label.text = "defsdvevfdf"
-        label.textColor = .brown
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.textColor = .black
+        label.font = Font.font1
         return label
     }()
     
     var timelable: UILabel = {
         
         let label = UILabel()
-//        label.text = "56"
-        label.textColor = .brown
-        label.font = UIFont.boldSystemFont(ofSize: 12)
+        label.textColor = .black
+        label.font = Font.font3
         return label
     }()
     

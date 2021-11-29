@@ -27,11 +27,12 @@ class RegistrationViewController: UIViewController {
         return imageView
     }()
     
-    var firstNameTextField = CustomTextField(placeholder: "  First Name")
-    var lastNameTextField = CustomTextField(placeholder: "  Last Name")
-    var emailTextField = CustomTextField(placeholder: "  Email")
-    var passwordTextField = CustomTextField(placeholder: "  Password")
-    var signUpButton1 = CustomButton(setTitle: "Sign Up")
+    var firstNameTextField = CustomTextField(placeholder: Placeholder.firstName)
+    var lastNameTextField = CustomTextField(placeholder: Placeholder.lastName)
+    var emailTextField = CustomTextField(placeholder: Placeholder.email)
+    var passwordTextField = CustomTextField(placeholder: Placeholder.password)
+//    var signUpButton1 = CustomButton(setTitle: "Sign Up")
+    var signUpButton1 = ButtonSetTitle.signUp
     
     lazy var firstNameContainer: InputContainerView = {
         firstNameTextField.keyboardType = .default
@@ -81,6 +82,14 @@ class RegistrationViewController: UIViewController {
     
     @objc func handleSignUp(){
         
+        let error = validateFields()
+        
+        if error != nil {
+            showAlert(title: "Error", message: error!)
+            return
+        }
+        else {
+            
         guard let firstName = firstNameTextField.text,
               let lastName = lastNameTextField.text,
               let email = emailTextField.text,
@@ -99,25 +108,6 @@ class RegistrationViewController: UIViewController {
             
         FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) {  [weak self] authResult, error in
                 
-//                guard authResult != nil, error == nil else {
-//                    self?.showAlert(title: "Error", message: "Error in creating user")
-//                    print(authResult)
-//                    return
-//                }
-//                let uid = authResult?.user.uid
-////                let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email)
-////                DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
-//            StorageManager.ImageUploader.uploadImage(image: profilePic, uid: uid!) { url in
-//                    let newUser = UserData(username: firstName + lastName, email: email, profileURL: url, uid: uid!)
-//                    DatabaseManager.shared.addUser(user: newUser)
-//                    self?.dismiss(animated: true)
-//
-//
-//
-//            self?.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
-//
-//
-//                }
             guard let self = self else {return}
             
             if error != nil {
@@ -136,7 +126,8 @@ class RegistrationViewController: UIViewController {
                 }
                 self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
             }
-            }
+          }
+        }
     }
 
     
@@ -166,15 +157,16 @@ class RegistrationViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
     }
     
-    
-    //
-    //    func alertUserLoginError(message: String = "please enter all information to create a new account") {
-    //
-    //        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-    //        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
-    //        present(alert, animated: true)
-    //
-    //    }
+    func validateFields() -> String? {
+        
+        if Validation.isEmailValid(emailTextField.text!) == false {
+            return "Please enter proper email"
+        }
+        if Validation.isPasswordValid(passwordTextField.text!) == false {
+            return "Please enter proper password"
+        }
+        return nil
+    }
     
     func configure() {
         

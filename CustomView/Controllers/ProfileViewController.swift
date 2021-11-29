@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 
 class ProfileViewController: UIViewController {
-
+    
     @IBOutlet var tableView: UITableView!
     
     var imageView: UIImageView!
@@ -32,14 +32,7 @@ class ProfileViewController: UIViewController {
     }
     
     func createTableHeader() -> UIView? {
-//        guard let email = UserDefaults.standard.value(forKey: "email") as? String  else {
-//            return nil
-//        }
-//
-//        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-//        let filename = safeEmail + "_profile_picture.png"
-//
-//        let path = "images/"+filename
+        
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 300))
         headerView.backgroundColor = .green
         
@@ -52,18 +45,7 @@ class ProfileViewController: UIViewController {
         imageView.layer.masksToBounds = true
         headerView.addSubview(imageView)
         
-//        StorageManager.shared.downloadURL(for: path, completion: { [weak self] result in
-//            switch result {
-//            case .success(let url):
-//                print("XXXXXXXXXXXXXXXXXXXXXXXx")
-//                self?.downloadImage(imageView: imageView, url: url)
-//            case .failure(let error):
-//                print("failed to get download url: \(error)")
-//            }
-//
-//        })
-        
-       return headerView
+        return headerView
     }
     
     func fetchuser(){
@@ -71,7 +53,6 @@ class ProfileViewController: UIViewController {
         let uid = Auth.auth().currentUser?.uid
         print( "Profile/\(uid)")
         StorageManager.shared.downloadImageWithPath(path: "Profile/\(uid!)") { image in
-            print("((((((((((((((((((((((((((")
             DispatchQueue.main.async {
                 self.imageView.image = image
                 
@@ -102,7 +83,7 @@ extension ProfileViewController:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = content[indexPath.row]
-//        cell.textLabel?.textAlignment = .center
+        //        cell.textLabel?.textAlignment = .center
         return cell
     }
     
@@ -117,9 +98,9 @@ extension ProfileViewController:UITableViewDelegate, UITableViewDataSource {
                 nav.modalPresentationStyle = .fullScreen
                 present(nav, animated: true, completion: nil)
             }
-
+            
         }
-         
-        }
+        
     }
-    
+}
+
