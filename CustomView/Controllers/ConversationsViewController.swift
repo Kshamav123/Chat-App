@@ -11,7 +11,7 @@ import FirebaseAuth
 class ConversationsViewController: UIViewController {
     
     let tableView: UITableView = {
-       
+        
         let table = UITableView()
         table.isHidden = true
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
@@ -40,7 +40,7 @@ class ConversationsViewController: UIViewController {
         view.addSubview(noConversationLabel)
         setUpTableView()
         fetchConversations()
-
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -51,7 +51,7 @@ class ConversationsViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-       validateAuth()
+        validateAuth()
     }
     
     //MARK: Actions

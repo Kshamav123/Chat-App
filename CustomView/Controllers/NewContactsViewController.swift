@@ -8,29 +8,26 @@
 import UIKit
 import FirebaseAuth
 
-
+protocol MessageControllerDelegate: AnyObject {
+    
+    func controller(_ controller : NewContactsViewController, wantsToStartChatWith chat: Chats)
+}
 
 class NewContactsViewController: UIViewController, UICollectionViewDelegate {
+    
+    //MARK: Properties
     
     var chats: [Chats] = []
     var results: [UserData] = []
     var users: [UserData] = []
     var currentUser: UserData?
     var hasFetched = false
-//    weak var delegate: NewContactsViewControllerDelegate?
+    weak var delegate: MessageControllerDelegate?
     var collectionView: UICollectionView!
     var uid :String = FirebaseAuth.Auth.auth().currentUser!.uid
     var searching : Bool = false
     let searchController = UISearchController(searchResultsController: nil)
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configureUI()
-        configureCollectionView()
-        configureSearchBar()
-        fetchAllUser()
-    }
-    
+ 
     let noResultLabel:UILabel = {
         let label = UILabel()
         label.text = "no results"
@@ -40,6 +37,18 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
         label.isHidden = true
         return label
     }()
+    
+    //MARK: Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureUI()
+        configureCollectionView()
+        configureSearchBar()
+        fetchAllUser()
+    }
+    
+    //MARK: Helpers
     
     func configureUI() {
         
@@ -68,11 +77,6 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
         }
     }
     
-    @objc func cancelTapped() {
-        
-        dismiss(animated: true, completion: nil)
-    }
-    
     func configureSearchBar(){
         searchController.loadViewIfNeeded()
         searchController.searchResultsUpdater = self
@@ -85,9 +89,17 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
         definesPresentationContext = true
     }
     
+    //MARK: Actions
+    
+    @objc func cancelTapped() {
+        
+        dismiss(animated: true, completion: nil)
+    }
 }
 
-extension NewContactsViewController:UICollectionViewDataSource {
+//MARK: UICollectionViewDataSource
+
+extension NewContactsViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let count = searching ? results.count : users.count
@@ -97,7 +109,6 @@ extension NewContactsViewController:UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ConversationCell
         let user = searching ? results[indexPath.row] : users[indexPath.row]
-        //        let user = users[indexPath.row]
         cell.lable1.text = user.username
         cell.timelable.isHidden = true
         cell.selectButton.isHidden = true
@@ -107,13 +118,13 @@ extension NewContactsViewController:UICollectionViewDataSource {
         StorageManager.shared.downloadImageWithPath(path: "Profile/\(uid)") { image in
             cell.imageView.image = image
             
-            
         }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+        print("selected")
         let selectedUser = searching ? results[indexPath.row] : users[indexPath.row]
         let users: [UserData] = [currentUser!, selectedUser]
         
@@ -125,18 +136,20 @@ extension NewContactsViewController:UICollectionViewDataSource {
             let uid2 = chat.users[1].uid
             if uid1 == currentUser!.uid && uid2 == selectedUser.uid || uid1 == selectedUser.uid && uid2 == currentUser!.uid {
                 currentChat.otherUser = uid1 == currentUser!.uid ? 1 : 0
-                vc.chat = currentChat
-                navigationController?.pushViewController(vc, animated: true)
+                print("delegate")
+                delegate?.controller(self, wantsToStartChatWith: currentChat)
+                print("controllller")
                 return
             }
         }
         DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id)
-        vc.chat = Chats(users: users, lastMessage: nil, messages: [], otherUser: 1, chatId: id)
-        navigationController?.pushViewController(vc, animated: true)
-        //        present(vc, animated: true, completion: nil)
+        var chat = Chats(users: users, lastMessage: nil, messages: [], otherUser: 1, chatId: id)
+        delegate?.controller(self, wantsToStartChatWith: chat)
     }
     
 }
+
+//MARK: UICollectionViewDelegateFlowLayout
 
 extension NewContactsViewController :UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -152,11 +165,12 @@ extension NewContactsViewController :UICollectionViewDelegateFlowLayout {
     }
 }
 
+//MARK: UISearchBarDelegate, UISearchResultsUpdating
 
 extension NewContactsViewController: UISearchBarDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
- 
+        
         let count = searchController.searchBar.text?.count
         let searchText = searchController.searchBar.text!
         if !searchText.isEmpty {
@@ -168,9 +182,7 @@ extension NewContactsViewController: UISearchBarDelegate, UISearchResultsUpdatin
         else{
             searching = false
             results = users
-            
         }
-        
         collectionView.reloadData()
     }
     
@@ -179,6 +191,5 @@ extension NewContactsViewController: UISearchBarDelegate, UISearchResultsUpdatin
         results = users
         collectionView.reloadData()
     }
-    
-    
 }
+

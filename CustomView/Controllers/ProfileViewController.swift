@@ -10,11 +10,14 @@ import FirebaseAuth
 
 class ProfileViewController: UIViewController {
     
+    //MARK: Properties
+    
     @IBOutlet var tableView: UITableView!
     
     var imageView: UIImageView!
-    
     let content = ["Logout"]
+    
+    //MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +33,8 @@ class ProfileViewController: UIViewController {
         tableView.tableHeaderView = createTableHeader()
         fetchuser()
     }
+    
+    //MARK: Helpers
     
     func createTableHeader() -> UIView? {
         
@@ -74,6 +79,8 @@ class ProfileViewController: UIViewController {
     }
 }
 
+//MARK: UITableViewDelegate, UITableViewDataSource
+
 extension ProfileViewController:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return content.count
@@ -83,7 +90,6 @@ extension ProfileViewController:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = content[indexPath.row]
-        //        cell.textLabel?.textAlignment = .center
         return cell
     }
     

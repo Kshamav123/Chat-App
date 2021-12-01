@@ -10,6 +10,8 @@ import FirebaseAuth
 
 class ViewController: UIViewController {
     
+    //MARK: Properties
+    
     var chats: [Chats] = []
     var currentUser: UserData?
     var collectionView: UICollectionView!
@@ -17,28 +19,42 @@ class ViewController: UIViewController {
     var initialFetch: Bool = false
     var uid : String!
     
+    //MARK: Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "person.badge.plus"), style: .done, target: self, action: #selector(didTapNewContacts))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(tapEdit))
         navigationController?.navigationBar.tintColor = UIColor.blue
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
-        //        configureNavigationBar()
-        //        configureUICollectionView()
-        //        fetchData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        validateAuth()
         isLoggedIn()
     }
+    
+    //MARK: Actions
     
     @objc func tapEdit() {
         
         tapped = !tapped
         collectionView.reloadData()
     }
+    
+    @objc func didTapNewContacts() {
+        
+        
+        let vc = NewContactsViewController()
+        vc.currentUser = currentUser
+        let nav = UINavigationController(rootViewController: vc)
+        vc.delegate = self
+        vc.chats = chats
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true, completion: nil)
+    }
+    
+    //MARK: Helpers
     
     func isLoggedIn() {
         if FirebaseAuth.Auth.auth().currentUser == nil {
@@ -57,7 +73,6 @@ class ViewController: UIViewController {
     
     func configureNavigationBar() {
         
-        //        view.backgroundColor = .white
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -67,7 +82,6 @@ class ViewController: UIViewController {
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        
     }
     
     func configureUICollectionView() {
@@ -75,11 +89,9 @@ class ViewController: UIViewController {
         uid = Auth.auth().currentUser?.uid
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
-        //        collectionView.backgroundColor = .black
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(ConversationCell.self, forCellWithReuseIdentifier: "cell")
-        
     }
     
     func validateAuth() {
@@ -91,7 +103,6 @@ class ViewController: UIViewController {
             nav.modalPresentationStyle = .fullScreen
             present(nav, animated: true, completion: nil)
         }
-        
     }
     
     func fetchData() {
@@ -114,23 +125,15 @@ class ViewController: UIViewController {
         
     }
     
-    @objc func didTapNewContacts() {
-        
-        
-        let vc = NewContactsViewController()
-        vc.currentUser = currentUser
-        let nav = UINavigationController(rootViewController: vc)
-        vc.chats = chats
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true, completion: nil)
-//        navigationController?.pushViewController(nav, animated: true)
-    }
 }
+
+//MARK: UICollectionViewDelegate
 
 extension ViewController : UICollectionViewDelegate {
     
-    
 }
+
+//MARK: UICollectionViewDataSource
 
 extension ViewController: UICollectionViewDataSource {
     
@@ -149,7 +152,7 @@ extension ViewController: UICollectionViewDataSource {
         
         let formattedDate = DateFormatter()
         formattedDate.dateFormat = "hh:mm:a"
-
+        
         if chat.lastMessage == nil {
             cell.timelable.isHidden = true
         } else {
@@ -168,30 +171,29 @@ extension ViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-//        let user = chats[indexPath.row]
         let vc = ChatViewController()
         vc.currentUser = currentUser
         vc.chat = chats[indexPath.row]
         vc.hidesBottomBarWhenPushed = true
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
-        //        present(vc, animated: true, completion: nil)
     }
 }
+
+//MARK: UICollectionViewDelegateFlowLayout
 
 extension ViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: view.frame.width, height: 100)
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
-    
 }
 
+//MARK: UserAuthenticatedDelegate
 
 extension ViewController: UserAuthenticatedDelegate {
     func UserAuthenticated() {
@@ -199,7 +201,19 @@ extension ViewController: UserAuthenticatedDelegate {
         configureUICollectionView()
         fetchData()
     }
-    
-    
-    
+}
+
+//MARK: MessageControllerDelegate
+
+extension ViewController: MessageControllerDelegate {
+    func controller(_ controller: NewContactsViewController, wantsToStartChatWith chat: Chats) {
+        
+        controller.dismiss(animated: true, completion: nil)
+        
+        let vc = ChatViewController()
+        vc.chat = chat
+        vc.hidesBottomBarWhenPushed = true
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }

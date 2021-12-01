@@ -52,8 +52,7 @@ class ConversationCell: UICollectionViewCell {
         
         return button
     }()
-    
-    
+
     var imageView : UIImageView = {
         let images = UIImageView()
         images.contentMode = .scaleAspectFit
@@ -62,8 +61,7 @@ class ConversationCell: UICollectionViewCell {
 //        images.backgroundColor = .blue
         images.clipsToBounds = true
         return images
-        
-       
+
     }()
     
     var lable1: UILabel = {

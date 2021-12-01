@@ -11,28 +11,24 @@ import FirebaseAuth
 class LoginViewController: UIViewController {
     
     //MARK: Properties
-    var delegate : UserAuthenticatedDelegate?
     
+    var delegate : UserAuthenticatedDelegate?
     let label : UILabel = {
         
-       let label = UILabel()
+        let label = UILabel()
         
         label.text = "Chat App"
         label.textColor = .white
-//        label.font = label.font.withSize(20)
         label.font = UIFont.boldSystemFont(ofSize: 40.0)
-       label.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         return label
     }()
     
-    
     var emailTextField = CustomTextField(placeholder: Placeholder.email)
     var passwordTextField = CustomTextField(placeholder: Placeholder.password)
-//    var signUpButton1 = CustomButton(setTitle: "Sign Up")
     var signUpButton1 = ButtonSetTitle.signUp
     var loginButton1 = ButtonSetTitle.login
-//    var loginButton1 = CustomButton(setTitle: "Login")
     
     lazy var emailContainerView : InputContainerView = {
         emailTextField.keyboardType = .emailAddress
@@ -45,10 +41,9 @@ class LoginViewController: UIViewController {
     lazy var passwordContainerView : InputContainerView = {
         passwordTextField.isSecureTextEntry = true
         return InputContainerView(image: UIImage(systemName: "lock")!, textField: passwordTextField)
-  
+        
     }()
-    
-    
+        
     //MARK: Lifecycle
     
     override func viewDidLoad() {
@@ -81,7 +76,6 @@ class LoginViewController: UIViewController {
         
     }
     
-    
     func createDismissKeyboardTapGesture(){
         let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(tap)
@@ -95,11 +89,9 @@ class LoginViewController: UIViewController {
     func validateFields() -> String? {
         
         if Validation.isEmailValid(emailTextField.text!) == false {
-//            showAlert(title: "Error", message: "Please enter proper email")
             return "Please enter proper email"
         }
         if Validation.isPasswordValid(passwordTextField.text!) == false {
-//            showAlert(title: "Error", message: "Please anter the password properly")
             return "Please enter proper password"
         }
         return nil
@@ -128,37 +120,33 @@ class LoginViewController: UIViewController {
             showAlert(title: "Error", message: error!)
             return
         }else {
-        guard let email = emailTextField.text, let password = passwordTextField.text, !email.isEmpty, !password.isEmpty else {
-            showAlert(title: "Error", message: "Please enter all the fields to login")
-            return
+            guard let email = emailTextField.text, let password = passwordTextField.text, !email.isEmpty, !password.isEmpty else {
+                showAlert(title: "Error", message: "Please enter all the fields to login")
+                return
+            }
+            FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { [weak self] authResult, error in
+                guard let strongSelf = self else {
+                    return
+                }
+                guard let result = authResult, error == nil else {
+                    return
+                }
+                let user = result.user
+                UserDefaults.standard.set(email, forKey: "email")
+                self!.delegate?.UserAuthenticated()
+                self!.dismiss(animated: true, completion: nil)
+                
+            })
         }
-        
-        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { [weak self] authResult, error in
-            guard let strongSelf = self else {
-                return
-            }
-            guard let result = authResult, error == nil else {
-                return
-            }
-            let user = result.user
-            UserDefaults.standard.set(email, forKey: "email")
-            self!.delegate?.UserAuthenticated()
-//            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
-            self!.dismiss(animated: true, completion: nil)
-            
-        })
     }
-}
     
     @objc func didTapRegister() {
         
         let vc = RegistrationViewController()
         vc.delegate = delegate
         vc.title = "Create Account"
-        //        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true, completion: nil)
-//        navigationController?.pushViewController(vc, animated: true)
+        
     }
-    
 }

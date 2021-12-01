@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Validation{
+class Validation {
     
     
   static  func isPasswordValid(_ password : String) -> Bool{

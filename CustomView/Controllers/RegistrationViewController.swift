@@ -31,7 +31,6 @@ class RegistrationViewController: UIViewController {
     var lastNameTextField = CustomTextField(placeholder: Placeholder.lastName)
     var emailTextField = CustomTextField(placeholder: Placeholder.email)
     var passwordTextField = CustomTextField(placeholder: Placeholder.password)
-//    var signUpButton1 = CustomButton(setTitle: "Sign Up")
     var signUpButton1 = ButtonSetTitle.signUp
     
     lazy var firstNameContainer: InputContainerView = {
@@ -90,46 +89,45 @@ class RegistrationViewController: UIViewController {
         }
         else {
             
-        guard let firstName = firstNameTextField.text,
-              let lastName = lastNameTextField.text,
-              let email = emailTextField.text,
-              let profilePic = photButton.image,
-              let password = passwordTextField.text, !firstName.isEmpty,!lastName.isEmpty, !email.isEmpty, !password.isEmpty else {
-                  self.showAlert(title: "Error", message: "Enter all the fields")
-                  return
-              }
-        DatabaseManager.shared.userExists(with: email) { exists in
-            
-            guard !exists else {
-                self.showAlert(title: "Exists", message: "Account for the email address already exists")
-                return
-            }
-        }
-            
-        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) {  [weak self] authResult, error in
+            guard let firstName = firstNameTextField.text,
+                  let lastName = lastNameTextField.text,
+                  let email = emailTextField.text,
+                  let profilePic = photButton.image,
+                  let password = passwordTextField.text, !firstName.isEmpty,!lastName.isEmpty, !email.isEmpty, !password.isEmpty else {
+                      self.showAlert(title: "Error", message: "Enter all the fields")
+                      return
+                  }
+            DatabaseManager.shared.userExists(with: email) { exists in
                 
-            guard let self = self else {return}
-            
-            if error != nil {
-                self.showAlert(title: "Error", message: error!.localizedDescription)
-                return
-            }
-            if let authResult = authResult{
-                let uid = authResult.user.uid
-                
-                StorageManager.ImageUploader.uploadImage(image: profilePic, uid: uid) { url in
-                    
-                    let newuser = UserData(username: firstName + lastName, email: email, profileURL: url, uid: uid)
-                    DatabaseManager.shared.addUser(user: newuser)
-                    self.delegate?.UserAuthenticated() 
-                    self.dismiss(animated: true, completion: nil)
+                guard !exists else {
+                    self.showAlert(title: "Exists", message: "Account for the email address already exists")
+                    return
                 }
-                self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
             }
-          }
+            
+            FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) {  [weak self] authResult, error in
+                
+                guard let self = self else {return}
+                
+                if error != nil {
+                    self.showAlert(title: "Error", message: error!.localizedDescription)
+                    return
+                }
+                if let authResult = authResult{
+                    let uid = authResult.user.uid
+                    
+                    StorageManager.ImageUploader.uploadImage(image: profilePic, uid: uid) { url in
+                        
+                        let newuser = UserData(username: firstName + lastName, email: email, profileURL: url, uid: uid)
+                        DatabaseManager.shared.addUser(user: newuser)
+                        self.delegate?.UserAuthenticated()
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                    self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
+                }
+            }
         }
     }
-
     
     @objc func keyboardWillShow(){
         print("Keybaord will show")
@@ -189,11 +187,16 @@ class RegistrationViewController: UIViewController {
         stack.rightAnchor.constraint(equalTo: view.rightAnchor,constant: -20).isActive = true
         
     }
-}
-
-//MARK: Extensions
-
-extension RegistrationViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func presentPhotoPicker() {
+        
+        let vc = UIImagePickerController()
+        vc.sourceType = .photoLibrary
+        vc.delegate = self
+        vc.allowsEditing = true
+        present(vc, animated: true)
+        
+    }
     
     func presentPhotoActionSheet() {
         
@@ -208,16 +211,11 @@ extension RegistrationViewController : UIImagePickerControllerDelegate, UINaviga
         present(actionSheet,animated: true)
         
     }
-    
-    func presentPhotoPicker() {
-        
-        let vc = UIImagePickerController()
-        vc.sourceType = .photoLibrary
-        vc.delegate = self
-        vc.allowsEditing = true
-        present(vc, animated: true)
-        
-    }
+}
+
+//MARK: UIImagePickerControllerDelegate, UINavigationControllerDelegate
+
+extension RegistrationViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
