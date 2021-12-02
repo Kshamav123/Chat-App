@@ -136,9 +136,7 @@ extension NewContactsViewController: UICollectionViewDataSource {
             let uid2 = chat.users[1].uid
             if uid1 == currentUser!.uid && uid2 == selectedUser.uid || uid1 == selectedUser.uid && uid2 == currentUser!.uid {
                 currentChat.otherUser = uid1 == currentUser!.uid ? 1 : 0
-                print("delegate")
                 delegate?.controller(self, wantsToStartChatWith: currentChat)
-                print("controllller")
                 return
             }
         }

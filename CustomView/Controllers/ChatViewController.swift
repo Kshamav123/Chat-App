@@ -128,7 +128,7 @@ class ChatViewController: UITableViewController  {
         
         if textField.text != "" {
             
-            let newMessage = Message(sender: currentUser.uid, message: textField.text!, time: Date(), seen: false)
+            let newMessage = Message(sender: currentUser.uid, message: textField.text!, time: Date(), seen: false, imagePath: "")
             messages.append(newMessage)
             chat.lastMessage = newMessage
             DatabaseManager.shared.addMessage(chat: chat!, id: chatId, messageContent: messages)
@@ -143,6 +143,7 @@ class ChatViewController: UITableViewController  {
     
     @objc func clickPhotoButton() {
         
+        presentPhotoActionSheet()
     }
     
     //MARK: Helpers
@@ -187,6 +188,37 @@ class ChatViewController: UITableViewController  {
         }
     }
     
+    func presentPhotoActionSheet() {
+            let actionSheet = UIAlertController(title: "Profile picture", message: "How would like to select a picture", preferredStyle: .actionSheet)
+            actionSheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: { [weak self] _ in
+                self?.presentPhotoLibrary()
+            }))
+            actionSheet.addAction(UIAlertAction(title: "Cancel", style: .default, handler:nil))
+            present(actionSheet, animated: true, completion: nil)
+        }
+    
+        func presentPhotoLibrary() {
+            let vc =  UIImagePickerController()
+            vc.sourceType = .photoLibrary
+            vc.delegate = self
+            vc.allowsEditing = true
+            present(vc, animated: true, completion: nil)
+        }
+    
+    func sendPhoto(img: UIImage) {
+        
+        let path = "MessageImages/\(NSUUID().uuidString)"
+        let newMessage = Message(sender: self.currentUser.uid, message: "", time: Date(), seen: false, imagePath: path)
+        messages.append(newMessage)
+        chat.lastMessage = newMessage
+        StorageManager.shared.uploadMessageImage(image: img, path: path) { url in
+            
+        }
+        DatabaseManager.shared.addMessage(chat: self.chat, id: self.chatId, messageContent: self.messages)
+        self.tableView.reloadData()
+    }
+    
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! ChatCell
         
@@ -206,4 +238,19 @@ class ChatViewController: UITableViewController  {
     }
 }
 
-
+extension ChatViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        picker.dismiss(animated: true, completion: nil)
+        
+        guard let selectedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else {
+            return
+        }
+        sendPhoto(img:selectedImage)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+}

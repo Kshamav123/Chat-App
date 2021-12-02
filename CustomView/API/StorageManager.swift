@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseStorage
+import FirebaseAuth
 
 class StorageManager {
     
@@ -58,6 +59,7 @@ class StorageManager {
     
     
     struct ImageUploader {
+        
         static  func uploadImage(image: UIImage, uid: String, completion: @escaping(String) -> Void) {
             
             let storage = Storage.storage().reference()
@@ -82,6 +84,26 @@ class StorageManager {
         }
     }
     
+    func uploadMessageImage(image: UIImage, path: String, completion: @escaping(String) -> Void) {
+               
+               let storage = Storage.storage().reference()
+               
+               guard let imageData = image.jpegData(compressionQuality: 0.4) else { return }
+               
+               storage.child(path).putData(imageData, metadata: nil) { _, error in
+                   guard error == nil else { return }
+                   
+                   storage.child(path).downloadURL { url, error in
+                       guard let url = url, error == nil else {
+                           return
+                       }
+                       
+                       let urlString = url.absoluteString
+                       completion(urlString)
+                   }
+               }
+           }
+    
     func downloadImageWithPath(path: String, completion: @escaping(UIImage) -> Void) {
         
         let storage = Storage.storage()
@@ -94,4 +116,6 @@ class StorageManager {
             }
         }
     }
+    
+   
 }

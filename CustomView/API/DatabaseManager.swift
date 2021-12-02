@@ -184,7 +184,7 @@ class DatabaseManager {
             if let result = snapshot.value as? [[String: Any]] {
                 
                 for message in result {
-                    
+     
                     resultArray.append(self.createMessageObject(dictionary: message))
                 }
                 
@@ -199,10 +199,11 @@ class DatabaseManager {
         let message = dictionary["message"] as! String
         let timeString = dictionary["time"] as! String
         let seen = dictionary["seen"] as! Bool
+        let imagePath = dictionary["imagePath"] as! String
         
         let time = databaseDateFormatter.date(from: timeString)
         
-        return Message(sender: sender, message: message, time: time!, seen: seen)
+        return Message(sender: sender, message: message, time: time!, seen: seen, imagePath: imagePath)
     }
     
     func addMessage(chat: Chats, id: String, messageContent: [Message]) {
