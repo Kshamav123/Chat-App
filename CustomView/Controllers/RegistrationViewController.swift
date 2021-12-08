@@ -17,12 +17,12 @@ class RegistrationViewController: UIViewController {
         
         let imageView = UIImageView()
         
-        imageView.tintColor = .white
+        imageView.tintColor = .magenta
         imageView.clipsToBounds = true
-        imageView.image = UIImage(systemName: "person.fill")
+//        imageView.image = UIImage(systemName: "person.fill")
+        imageView.image = SystemImage.personImage
         imageView.layer.cornerRadius = 40
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = .darkGray
+        imageView.backgroundColor = .white
         
         return imageView
     }()
@@ -32,29 +32,34 @@ class RegistrationViewController: UIViewController {
     var emailTextField = CustomTextField(placeholder: Placeholder.email)
     var passwordTextField = CustomTextField(placeholder: Placeholder.password)
     var signUpButton1 = ButtonSetTitle.signUp
+    let scrollView = UIScrollView()
     
     lazy var firstNameContainer: InputContainerView = {
         firstNameTextField.keyboardType = .default
-        return InputContainerView(image: UIImage(systemName: "person.fill")!, textField: firstNameTextField)
+
+        return InputContainerView(image: SystemImage.personImage!, textField: firstNameTextField)
         
     }()
     
     lazy var lastNameContainer: InputContainerView = {
         lastNameTextField.keyboardType = .default
-        return InputContainerView(image: UIImage(systemName: "person.fill")!, textField: lastNameTextField)
+
+        return InputContainerView(image: SystemImage.personImage!, textField: lastNameTextField)
     }()
     
     lazy var emailContainer: InputContainerView = {
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocorrectionType = .no
         emailTextField.autocapitalizationType = .none
-        return InputContainerView(image: UIImage(systemName: "envelope")!, textField: emailTextField)
+
+        return InputContainerView(image: SystemImage.email!, textField: emailTextField)
         
     }()
     
     lazy var passwordContainer: InputContainerView = {
         passwordTextField.isSecureTextEntry = true
-        return InputContainerView(image: UIImage(systemName: "lock")!, textField: passwordTextField)
+
+        return InputContainerView(image: SystemImage.password!, textField: passwordTextField)
     }()
     
     
@@ -62,9 +67,9 @@ class RegistrationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
+        view.backgroundColor = .white
         configure()
-        //        configureNotificationObserver()
+                configureNotificationObserver()
         //        createDismissKeyboardTapGesture()
         photButton.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapChangeProfilePic))
@@ -130,17 +135,22 @@ class RegistrationViewController: UIViewController {
     }
     
     @objc func keyboardWillShow(){
-        print("Keybaord will show")
+      
         if view.frame.origin.y == 0 {
             self.view.frame.origin.y -= 70
         }
     }
     
     @objc func keyboardWillHide(){
-        print("Keybaord will hide")
+        
         if view.frame.origin.y == -70 {
             self.view.frame.origin.y = 0
         }
+    }
+    
+    @objc func scrollingTheView() {
+        
+        scrollView.contentSize = CGSize(width: view.frame.width, height: 600)
     }
     
     //MARK: Helpers
@@ -151,8 +161,9 @@ class RegistrationViewController: UIViewController {
     }
     
     func configureNotificationObserver(){
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(scrollingTheView), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     func validateFields() -> String? {
@@ -170,22 +181,37 @@ class RegistrationViewController: UIViewController {
         
         signUpButton1.addTarget(self, action: #selector(handleSignUp), for: .touchUpInside)
         
-        view.addSubview(photButton)
-        photButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        photButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40).isActive = true
-        photButton.heightAnchor.constraint(equalToConstant: 120).isActive = true
-        photButton.widthAnchor.constraint(equalToConstant: 120).isActive = true
+//        view.addSubview(photButton)
         
         let stack = UIStackView(arrangedSubviews: [firstNameContainer,lastNameContainer,emailContainer,passwordContainer,signUpButton1])
         stack.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        photButton.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 10
-        view.addSubview(stack)
+        
+//        view.addSubview(stack)
+        view.addSubview(scrollView)
+        scrollView.addSubview(photButton)
+        scrollView.addSubview(stack)
+        
+        scrollView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        scrollView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        photButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        photButton.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 40).isActive = true
+        photButton.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        photButton.widthAnchor.constraint(equalToConstant: 120).isActive = true
         
         stack.topAnchor.constraint(equalTo: photButton.bottomAnchor, constant: 80).isActive = true
-        stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
-        stack.rightAnchor.constraint(equalTo: view.rightAnchor,constant: -20).isActive = true
-        
+//        stack.leftAnchor.constraint(equalTo: scrollView.leftAnchor, constant: 20).isActive = true
+//        stack.rightAnchor.constraint(equalTo: scrollView.rightAnchor,constant: -20).isActive = true
+        stack.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        stack .widthAnchor.constraint(equalToConstant: 350).isActive = true
+        scrollView.contentSize = CGSize(width: view.frame.width, height: 600)
+    
     }
     
     func presentPhotoPicker() {

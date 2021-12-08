@@ -28,15 +28,15 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
     var searching : Bool = false
     let searchController = UISearchController(searchResultsController: nil)
  
-    let noResultLabel:UILabel = {
-        let label = UILabel()
-        label.text = "no results"
-        label.textAlignment = .center
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 21, weight: .medium)
-        label.isHidden = true
-        return label
-    }()
+//    let noResultLabel:UILabel = {
+//        let label = UILabel()
+//        label.text = "no results"
+//        label.textAlignment = .center
+//        label.textColor = .label
+//        label.font = .systemFont(ofSize: 21, weight: .medium)
+//        label.isHidden = true
+//        return label
+//    }()
     
     //MARK: Lifecycle
     
@@ -60,7 +60,7 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
     
     func configureCollectionView() {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
-        view.addSubview(noResultLabel)
+//        view.addSubview(noResultLabel)
         view.addSubview(collectionView)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -130,7 +130,10 @@ extension NewContactsViewController: UICollectionViewDataSource {
         
         let id = "\(currentUser!.uid)_\(selectedUser.uid)"
         let vc = ChatViewController()
+        
+        
         for chat in chats {
+            if chat.isGroupChat! { continue }
             var currentChat = chat
             let uid1 = chat.users[0].uid
             let uid2 = chat.users[1].uid
@@ -140,8 +143,10 @@ extension NewContactsViewController: UICollectionViewDataSource {
                 return
             }
         }
-        DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id)
-        var chat = Chats(users: users, lastMessage: nil, messages: [], otherUser: 1, chatId: id)
+//        DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id)
+        DatabaseManager.shared.addChat1(users: [currentUser!,selectedUser], id: id, isGroupChat: false, groupName: "", groupIconPath: "")
+//        var chat = Chats(users: users, lastMessage: nil, messages: [], otherUser: 1, chatId: id)
+        var chat = Chats(users: users, lastMessage: nil, messages: [], otherUser: 1, chatId: id, isGroupChat: false)
         delegate?.controller(self, wantsToStartChatWith: chat)
     }
     

@@ -18,7 +18,7 @@ class LoginViewController: UIViewController {
         let label = UILabel()
         
         label.text = "Chat App"
-        label.textColor = .white
+        label.textColor = .link
         label.font = UIFont.boldSystemFont(ofSize: 40.0)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
@@ -29,18 +29,22 @@ class LoginViewController: UIViewController {
     var passwordTextField = CustomTextField(placeholder: Placeholder.password)
     var signUpButton1 = ButtonSetTitle.signUp
     var loginButton1 = ButtonSetTitle.login
+    var forgotPasswordButton = ButtonSetTitle.forgotPassword
+    let scrollView = UIScrollView()
     
     lazy var emailContainerView : InputContainerView = {
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocorrectionType = .no
         emailTextField.autocapitalizationType = .none
-        return InputContainerView(image: UIImage(systemName: "envelope")!, textField: emailTextField)
+
+        return InputContainerView(image: SystemImage.email!, textField: emailTextField)
         
     }()
     
     lazy var passwordContainerView : InputContainerView = {
         passwordTextField.isSecureTextEntry = true
-        return InputContainerView(image: UIImage(systemName: "lock")!, textField: passwordTextField)
+
+        return InputContainerView(image: SystemImage.password!, textField: passwordTextField)
         
     }()
         
@@ -48,13 +52,10 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
-        
-        navigationItem.title = "Login"
-        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+        view.backgroundColor = .white
         configure()
         //        createDismissKeyboardTapGesture()
-        //        configureNotificationObserver()
+                configureNotificationObserver()
         
     }
     
@@ -64,16 +65,27 @@ class LoginViewController: UIViewController {
         
         loginButton1.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
         signUpButton1.addTarget(self, action: #selector(didTapRegister), for: .touchUpInside)
-        let stack = UIStackView(arrangedSubviews: [label, emailContainerView, passwordContainerView, loginButton1, signUpButton1])
+        forgotPasswordButton.addTarget(self, action: #selector(handleForgotPassword), for: .touchUpInside)
+        let stack = UIStackView(arrangedSubviews: [label, emailContainerView, passwordContainerView, loginButton1, signUpButton1, forgotPasswordButton])
         stack.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 10
-        view.addSubview(stack)
+
+        stack.distribution = .fill
+
+        view.addSubview(scrollView)
+        scrollView.addSubview(stack)
         
-        stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150).isActive = true
-        stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
-        stack.rightAnchor.constraint(equalTo: view.rightAnchor,constant: -20).isActive = true
+        scrollView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        scrollView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
+        stack.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 150).isActive = true
+        stack.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        stack .widthAnchor.constraint(equalToConstant: 350).isActive = true
+        scrollView.contentSize = CGSize(width: view.frame.width, height: 1000)
     }
     
     func createDismissKeyboardTapGesture(){
@@ -82,8 +94,10 @@ class LoginViewController: UIViewController {
     }
     
     func configureNotificationObserver(){
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(scrollingTheView), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     func validateFields() -> String? {
@@ -99,15 +113,20 @@ class LoginViewController: UIViewController {
     
     //MARK: Actions
     
+    @objc func scrollingTheView() {
+        
+        scrollView.contentSize = CGSize(width: view.frame.width, height: 1000)
+    }
+    
     @objc func keyboardWillShow(){
-        print("Keybaord will show")
+
         if view.frame.origin.y == 0 {
             self.view.frame.origin.y -= 70
         }
     }
     
     @objc func keyboardWillHide(){
-        print("Keybaord will hide")
+        
         if view.frame.origin.y == -70 {
             self.view.frame.origin.y = 0
         }
@@ -148,5 +167,12 @@ class LoginViewController: UIViewController {
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true, completion: nil)
         
+    }
+    
+    @objc func handleForgotPassword() {
+        
+        let resetVC = ForgotPasswordViewController()
+        resetVC.modalPresentationStyle = .fullScreen
+        present(resetVC, animated: true, completion: nil)
     }
 }

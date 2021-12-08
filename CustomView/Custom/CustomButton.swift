@@ -12,10 +12,11 @@ class CustomButton: UIButton {
     
     init(setTitle: String) {
         super.init(frame: .zero)
-        backgroundColor = .darkGray
+        backgroundColor = .link
         translatesAutoresizingMaskIntoConstraints = false
         heightAnchor.constraint(equalToConstant: 50).isActive = true
         layer.cornerRadius = 20
+    
         self.setTitle(setTitle, for: .normal)
     
 }

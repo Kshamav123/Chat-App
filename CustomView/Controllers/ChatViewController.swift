@@ -15,13 +15,14 @@ class ChatViewController: UITableViewController  {
     var messages = [Message]()
     var currentUser : UserData!
     var otherUser: UserData!
-    var chatId: String!
+    //    var chatId: String!
+    let uid = DatabaseManager.shared.getUID()
     
-    let textField = CustomTextField(placeholder: "  Message")
+    let textField = CustomTextField(placeholder: Placeholder.message)
     
     let sendButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "arrowtriangle.right.fill"), for: .normal)
+        button.setImage(SystemImage.send, for: .normal)
         button.tintColor = .white
         button.backgroundColor = .link
         button.layer.cornerRadius = 25
@@ -33,7 +34,7 @@ class ChatViewController: UITableViewController  {
     
     let photoButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "photo.artframe"), for: .normal)
+        button.setImage(SystemImage.photo, for: .normal)
         button.tintColor = .white
         button.backgroundColor = .link
         button.layer.cornerRadius = 25
@@ -131,7 +132,7 @@ class ChatViewController: UITableViewController  {
             let newMessage = Message(sender: currentUser.uid, message: textField.text!, time: Date(), seen: false, imagePath: "")
             messages.append(newMessage)
             chat.lastMessage = newMessage
-            DatabaseManager.shared.addMessage(chat: chat!, id: chatId, messageContent: messages)
+            DatabaseManager.shared.addMessage(chat: chat!, id: chat.chatId!, messageContent: messages)
             textField.text = ""
             
             DispatchQueue.main.async {
@@ -155,23 +156,32 @@ class ChatViewController: UITableViewController  {
     
     func configure() {
         
-        chatId = "\(chat.users[0].uid)_\(chat.users[1].uid)"
+        var name: String
         
-        if chat.otherUser == 0 {
-            otherUser = chat.users[0]
-            currentUser = chat.users[1]
-        } else {
-            otherUser = chat.users[1]
-            currentUser = chat.users[0]
+        DatabaseManager.shared.fetchUser(uid: uid!, completion: { user in
+            self.currentUser = user
+        })
+        
+        if chat.isGroupChat! {
+            name = chat.groupName!
+        }else {
+            if chat.users[0].uid == uid {
+                name = chat.users[1].username
+            } else {
+                name = chat.users[0].username
+            }
         }
-        navigationItem.title = otherUser.username
+        
+        navigationItem.title = name
     }
+    
     
     func configureTableView() {
         
         tableView.contentInset = UIEdgeInsets(top: 5, left: 0, bottom: 70 , right: 0)
         tableView.separatorStyle = .none
         tableView.register(ChatCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(ImageCell.self, forCellReuseIdentifier: "Imagecell")
         tableView.alwaysBounceVertical = true
     }
     
@@ -189,21 +199,21 @@ class ChatViewController: UITableViewController  {
     }
     
     func presentPhotoActionSheet() {
-            let actionSheet = UIAlertController(title: "Profile picture", message: "How would like to select a picture", preferredStyle: .actionSheet)
-            actionSheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: { [weak self] _ in
-                self?.presentPhotoLibrary()
-            }))
-            actionSheet.addAction(UIAlertAction(title: "Cancel", style: .default, handler:nil))
-            present(actionSheet, animated: true, completion: nil)
-        }
+        let actionSheet = UIAlertController(title: "Profile picture", message: "How would like to select a picture", preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: { [weak self] _ in
+            self?.presentPhotoLibrary()
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .default, handler:nil))
+        present(actionSheet, animated: true, completion: nil)
+    }
     
-        func presentPhotoLibrary() {
-            let vc =  UIImagePickerController()
-            vc.sourceType = .photoLibrary
-            vc.delegate = self
-            vc.allowsEditing = true
-            present(vc, animated: true, completion: nil)
-        }
+    func presentPhotoLibrary() {
+        let vc =  UIImagePickerController()
+        vc.sourceType = .photoLibrary
+        vc.delegate = self
+        vc.allowsEditing = true
+        present(vc, animated: true, completion: nil)
+    }
     
     func sendPhoto(img: UIImage) {
         
@@ -214,19 +224,35 @@ class ChatViewController: UITableViewController  {
         StorageManager.shared.uploadMessageImage(image: img, path: path) { url in
             
         }
-        DatabaseManager.shared.addMessage(chat: self.chat, id: self.chatId, messageContent: self.messages)
+        DatabaseManager.shared.addMessage(chat: self.chat, id: self.chat.chatId!, messageContent: self.messages)
         self.tableView.reloadData()
     }
     
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! ChatCell
         
-        let messageItem : Message = messages[indexPath.row]
-        cell.message1 = messageItem
-        cell.message.text = messageItem.message
-        
-        return cell
+        if messages[indexPath.row].imagePath == "" {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! ChatCell
+            
+            let messageItem : Message = messages[indexPath.row]
+            cell.message1 = messageItem
+            cell.message.text = messageItem.message
+            cell.userList = chat.users
+            return cell
+            
+        } else {
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Imagecell", for: indexPath) as! ImageCell
+            cell.message1 = messages[indexPath.row]
+            cell.userList = chat.users
+            StorageManager.shared.downloadImageWithPath(path: messages[indexPath.row].imagePath!, completion: { image in
+                DispatchQueue.main.async {
+                    cell.messageImage.image = image
+                }
+            })
+            
+            return cell
+        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

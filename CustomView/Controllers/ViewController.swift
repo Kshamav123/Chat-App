@@ -23,7 +23,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "person.badge.plus"), style: .done, target: self, action: #selector(didTapNewContacts))
+        let addNewContact = UIBarButtonItem(image: SystemImage.addNewContact, style: .done, target: self, action: #selector(didTapNewContacts))
+        let groupChat = UIBarButtonItem(title: "New Group", style: .done, target: self, action: #selector(didTapGroupChat))
+        navigationItem.rightBarButtonItems = [addNewContact, groupChat]
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(tapEdit))
         navigationController?.navigationBar.tintColor = UIColor.blue
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
@@ -52,6 +54,22 @@ class ViewController: UIViewController {
         vc.chats = chats
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true, completion: nil)
+    }
+    
+    @objc func didTapGroupChat() {
+        
+        let vc = GroupChatViewController()
+        vc.currentUser = currentUser
+//        vc.hidesBottomBarWhenPushed = true
+//        vc.navigationItem.largeTitleDisplayMode = .never
+//        navigationController?.pushViewController(vc, animated: true)
+        let nav = UINavigationController(rootViewController: vc)
+        vc.delegate = self
+//        vc.chats = chats
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true, completion: nil)
+        
+        
     }
     
     //MARK: Helpers
@@ -116,7 +134,7 @@ class ViewController: UIViewController {
             self.currentUser = currentUser
         }
         
-        DatabaseManager.shared.fetchChats(uid: uid!) { chats in
+        DatabaseManager.shared.fetchChats1(uid: uid!) { chats in
             self.chats = chats
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
@@ -145,9 +163,9 @@ extension ViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ConversationCell
         cell.backgroundColor = .white
         let chat = chats[indexPath.row]
-        let otherUser = chat.users[chat.otherUser!]
+       
         cell.animateCell(show: tapped)
-        cell.lable1.text = otherUser.username
+       
         cell.lable2.text = chat.lastMessage?.message
         
         let formattedDate = DateFormatter()
@@ -160,11 +178,20 @@ extension ViewController: UICollectionViewDataSource {
             cell.timelable.isHidden = false
             cell.timelable.text = formattedDate.string(from: chat.lastMessage!.time)
         }
-        
-        
-        StorageManager.shared.downloadImageWithPath(path: "Profile/\(otherUser.uid)") { image in
+        var path : String
+        if chat.isGroupChat! {
+            path = chat.groupIconPath!
+            cell.lable1.text = chat.groupName
+        }else{
+            
+        let otherUser = chat.users[chat.otherUser!]
+        path = "Profile/\(otherUser.uid)"
+        cell.lable1.text = otherUser.username
+        }
+        StorageManager.shared.downloadImageWithPath(path: path) { image in
             cell.imageView.image = image
         }
+        
         
         return cell
     }
@@ -217,3 +244,18 @@ extension ViewController: MessageControllerDelegate {
         navigationController?.pushViewController(vc, animated: true)
     }
 }
+
+extension ViewController: GroupChatControllerDelegate {
+    func controllerGroup(wantsToStartChatWith chat: Chats) {
+        dismiss(animated: true, completion: nil)
+        
+        let vc = ChatViewController()
+        vc.chat = chat
+        vc.hidesBottomBarWhenPushed = true
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    
+}
+

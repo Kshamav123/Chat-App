@@ -82,7 +82,8 @@ class DatabaseManager {
         
     }
     
-    func addChat(user1: UserData, user2: UserData, id: String) {
+    func addChat(user1: UserData, user2: UserData, id: String, isGroupChat: Bool, groupName: String?, groupIconPath: String?) {
+        
         var userDictionary: [[String: Any]] = []
         
         userDictionary.append(user1.dictionary)
@@ -90,6 +91,25 @@ class DatabaseManager {
         let finalDic = ["users" : userDictionary]
         
         database.child("Chats").child(id).setValue(finalDic)
+    }
+    
+    func addChat1(users: [UserData], id: String, isGroupChat: Bool, groupName: String?, groupIconPath: String?) {
+        var userDictionary: [[String: Any]] = []
+        var finalDictionary: [String: Any]
+        
+        for user in users {
+            userDictionary.append(user.dictionary)
+        }
+        if isGroupChat {
+            finalDictionary = ["users": userDictionary,
+                               "isGroupChat": isGroupChat,
+                               "groupName": groupName!,
+                               "groupIconPath": groupIconPath!]
+        }else{
+            finalDictionary = ["users" : userDictionary,
+                               "isGroupChat": isGroupChat]
+        }
+        database.child("Chats").child(id).setValue(finalDictionary)
     }
     
     public func onLogout() ->Bool{
@@ -174,6 +194,81 @@ class DatabaseManager {
                 completion(chats)
             }
         }
+    }
+    
+    func fetchChats1(uid: String, completion: @escaping([Chats]) -> Void) {
+        
+        database.child("Chats").observe(.value) { snapshot in
+            var chats = [Chats]()
+            print("//////////////////////////")
+            if let result = snapshot.value as? [String: [String: Any]] {
+                //                print(result)
+                for key in result.keys {
+                    //                   print(key)
+                    let value = result[key]!
+                    var messagesArray: [Message] = []
+                    var lastMessage: Message?
+                    
+                    let users = value["users"] as! [[String: Any]]
+                    let lastMessageDictionary = value["lastMessage"] as? [String: Any]
+                    let isGroupChat = value["isGroupChat"] as! Bool
+                    
+                    if lastMessageDictionary != nil {
+                        
+                        let sender = lastMessageDictionary!["sender"] as! String
+                        let message = lastMessageDictionary!["message"] as! String
+                        let timeString = lastMessageDictionary!["time"] as! String
+                        let seen = lastMessageDictionary!["seen"] as! Bool
+                        
+                        let time = self.databaseDateFormatter.date(from: timeString)
+                        
+                        lastMessage = Message(sender: sender, message: message, time: time!, seen: seen)
+                    }else {
+                        
+                        lastMessage = nil
+                    }
+                    var usersArray: [UserData] = []
+                    var uidArray: [String] = []
+                    let id = key
+                    var chat: Chats
+                    for user in users {
+                        let userObject = self.createUserObject(dictionary: user)
+                        usersArray.append(userObject)
+                        uidArray.append(userObject.uid)
+                    }
+                    if isGroupChat {
+                        let groupName = value["groupName"] as! String
+                        let groupIconPath = value["groupIconPath"] as! String
+                        
+                        chat = Chats(users: usersArray, lastMessage: lastMessage, messages: [],  chatId: id, isGroupChat: isGroupChat, groupName: groupName, groupIconPath: groupIconPath)
+                        
+                    } else {
+                        var otherUser: Int
+                        if usersArray[0].uid == uid {
+                            otherUser = 1
+                        } else {
+                            otherUser = 0
+                        }
+                        chat = Chats(users: usersArray, lastMessage: lastMessage, messages: [], otherUser: otherUser, chatId: id, isGroupChat: isGroupChat)
+                    }
+                    
+                    if uidArray.contains(uid) {
+                        chats.append(chat)
+                    }
+                }
+                completion(chats)
+            }
+            
+        }
+    }
+                    
+    func createUserObject(dictionary: [String: Any]) -> UserData {
+        let email = dictionary["email"] as! String
+        let username = dictionary["username"] as! String
+        let uid = dictionary["uid"] as! String
+        let profileURL = dictionary["profileURL"] as! String
+        
+        return UserData(username: username, email: email, profileURL: profileURL, uid: uid)
     }
     
     func fetchMessages(chatId: String, completion: @escaping([Message]) -> Void) {

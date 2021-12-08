@@ -68,7 +68,7 @@ class StorageManager {
             
             storage.child("Profile").child(uid).putData(imageData, metadata: nil) { _, error in
                 guard error == nil else { return }
-                
+                print("NNNNNNNNNNNNNNNNNN")
                 storage.child("Profile").child(uid).downloadURL { url, error in
                     guard let url = url, error == nil else {
                         return
