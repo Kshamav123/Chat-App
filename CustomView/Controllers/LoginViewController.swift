@@ -18,15 +18,15 @@ class LoginViewController: UIViewController {
         let label = UILabel()
         
         label.text = "Chat App"
-        label.textColor = .link
+        label.textColor = UIColor(red: 0.02, green: 0.275, blue: 0.251, alpha: 1)
         label.font = UIFont.boldSystemFont(ofSize: 40.0)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         return label
     }()
     
-    var emailTextField = CustomTextField(placeholder: Placeholder.email)
-    var passwordTextField = CustomTextField(placeholder: Placeholder.password)
+    var emailTextField = CustomTextField(placeholder: "")
+    var passwordTextField = CustomTextField(placeholder: "")
     var signUpButton1 = ButtonSetTitle.signUp
     var loginButton1 = ButtonSetTitle.login
     var forgotPasswordButton = ButtonSetTitle.forgotPassword
@@ -36,15 +36,18 @@ class LoginViewController: UIViewController {
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocorrectionType = .no
         emailTextField.autocapitalizationType = .none
-
-        return InputContainerView(image: SystemImage.email!, textField: emailTextField)
+        emailTextField.attributedPlaceholder = NSAttributedString(string: Placeholder.email, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return InputContainerView(image: SystemImage.email!, textField: emailTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
         
     }()
     
     lazy var passwordContainerView : InputContainerView = {
+        
+        passwordTextField.attributedPlaceholder = NSAttributedString(string: Placeholder.password, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        passwordTextField.textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
         passwordTextField.isSecureTextEntry = true
 
-        return InputContainerView(image: SystemImage.password!, textField: passwordTextField)
+        return InputContainerView(image: SystemImage.password!, textField: passwordTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
         
     }()
         
@@ -52,7 +55,7 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         configure()
         //        createDismissKeyboardTapGesture()
                 configureNotificationObserver()
@@ -64,6 +67,8 @@ class LoginViewController: UIViewController {
     func configure() {
         
         loginButton1.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
+//        loginButton1.addTarget(self, action: #selector(animation), for: .touchUpInside)
+        
         signUpButton1.addTarget(self, action: #selector(didTapRegister), for: .touchUpInside)
         forgotPasswordButton.addTarget(self, action: #selector(handleForgotPassword), for: .touchUpInside)
         let stack = UIStackView(arrangedSubviews: [label, emailContainerView, passwordContainerView, loginButton1, signUpButton1, forgotPasswordButton])
@@ -111,7 +116,13 @@ class LoginViewController: UIViewController {
         return nil
     }
     
+   
     //MARK: Actions
+    
+    @objc func animation(sender: CustomButton){
+        
+        sender.pulsanate()
+    }
     
     @objc func scrollingTheView() {
         
@@ -132,7 +143,9 @@ class LoginViewController: UIViewController {
         }
     }
     
-    @objc func handleLogin() {
+    @objc func handleLogin(sender: UIButton) {
+        
+        sender.pulsanate()
         
         let error = validateFields()
         if error != nil {
@@ -159,18 +172,17 @@ class LoginViewController: UIViewController {
         }
     }
     
-    @objc func didTapRegister() {
+    @objc func didTapRegister(sender: UIButton) {
         
         let vc = RegistrationViewController()
-        vc.delegate = delegate
-        vc.title = "Create Account"
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true, completion: nil)
         
     }
     
-    @objc func handleForgotPassword() {
+    @objc func handleForgotPassword(sender: UIButton) {
         
+        sender.shake()
         let resetVC = ForgotPasswordViewController()
         resetVC.modalPresentationStyle = .fullScreen
         present(resetVC, animated: true, completion: nil)

@@ -27,16 +27,8 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
     var uid :String = FirebaseAuth.Auth.auth().currentUser!.uid
     var searching : Bool = false
     let searchController = UISearchController(searchResultsController: nil)
- 
-//    let noResultLabel:UILabel = {
-//        let label = UILabel()
-//        label.text = "no results"
-//        label.textAlignment = .center
-//        label.textColor = .label
-//        label.font = .systemFont(ofSize: 21, weight: .medium)
-//        label.isHidden = true
-//        return label
-//    }()
+    
+    open var barTintColor: UIColor?
     
     //MARK: Lifecycle
     
@@ -52,19 +44,20 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
     
     func configureUI() {
         
-        view.backgroundColor = .white
-        navigationItem.backButtonTitle = ""
-        let cancel = UIBarButtonItem(title: "cancel", style: .done, target: self, action: #selector(cancelTapped))
+//        navigationItem.backButtonTitle = ""
+        let cancel = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelTapped))
+        navigationController?.navigationBar.tintColor = UIColor(red: 0.835, green: 0.867, blue: 0.878, alpha: 1)
         navigationItem.rightBarButtonItems = [cancel]
     }
     
     func configureCollectionView() {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
-//        view.addSubview(noResultLabel)
+
         view.addSubview(collectionView)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(ConversationCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
     }
     
     func fetchAllUser() {
@@ -78,9 +71,15 @@ class NewContactsViewController: UIViewController, UICollectionViewDelegate {
     }
     
     func configureSearchBar(){
+        
+        searchController.searchBar.searchTextField.textColor = UIColor(red: 0.835, green: 0.867, blue: 0.878, alpha: 1)
+        searchController.searchBar.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
+        
+        searchController.searchBar.tintColor = UIColor(red: 0.835, green: 0.867, blue: 0.878, alpha: 1)
         searchController.loadViewIfNeeded()
         searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
+      
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.enablesReturnKeyAutomatically = false
         searchController.searchBar.returnKeyType = UIReturnKeyType.done
@@ -112,7 +111,7 @@ extension NewContactsViewController: UICollectionViewDataSource {
         cell.lable1.text = user.username
         cell.timelable.isHidden = true
         cell.selectButton.isHidden = true
-        
+        cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         let uid = user.uid
         
         StorageManager.shared.downloadImageWithPath(path: "Profile/\(uid)") { image in
@@ -143,9 +142,7 @@ extension NewContactsViewController: UICollectionViewDataSource {
                 return
             }
         }
-//        DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id)
         DatabaseManager.shared.addChat1(users: [currentUser!,selectedUser], id: id, isGroupChat: false, groupName: "", groupIconPath: "")
-//        var chat = Chats(users: users, lastMessage: nil, messages: [], otherUser: 1, chatId: id)
         var chat = Chats(users: users, lastMessage: nil, messages: [], otherUser: 1, chatId: id, isGroupChat: false)
         delegate?.controller(self, wantsToStartChatWith: chat)
     }

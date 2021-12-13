@@ -27,8 +27,9 @@ class ViewController: UIViewController {
         let groupChat = UIBarButtonItem(title: "New Group", style: .done, target: self, action: #selector(didTapGroupChat))
         navigationItem.rightBarButtonItems = [addNewContact, groupChat]
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(tapEdit))
-        navigationController?.navigationBar.tintColor = UIColor.blue
+        navigationController?.navigationBar.tintColor = UIColor(red: 0.616, green: 0.647, blue: 0.675, alpha: 1)
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
+       
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -46,7 +47,6 @@ class ViewController: UIViewController {
     
     @objc func didTapNewContacts() {
         
-        
         let vc = NewContactsViewController()
         vc.currentUser = currentUser
         let nav = UINavigationController(rootViewController: vc)
@@ -60,16 +60,11 @@ class ViewController: UIViewController {
         
         let vc = GroupChatViewController()
         vc.currentUser = currentUser
-//        vc.hidesBottomBarWhenPushed = true
-//        vc.navigationItem.largeTitleDisplayMode = .never
-//        navigationController?.pushViewController(vc, animated: true)
         let nav = UINavigationController(rootViewController: vc)
         vc.delegate = self
-//        vc.chats = chats
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true, completion: nil)
-        
-        
+                
     }
     
     //MARK: Helpers
@@ -91,12 +86,12 @@ class ViewController: UIViewController {
     
     func configureNavigationBar() {
         
-        
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.backgroundColor = .link
-        
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor(red: 0.616, green: 0.647, blue: 0.675, alpha: 1)]
+        appearance.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
+        navigationItem.title = "ChatApp"
+//        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
@@ -110,6 +105,7 @@ class ViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(ConversationCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.layer.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1).cgColor
     }
     
     func validateAuth() {
@@ -161,7 +157,7 @@ extension ViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ConversationCell
-        cell.backgroundColor = .white
+        cell.layer.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1).cgColor
         let chat = chats[indexPath.row]
        
         cell.animateCell(show: tapped)
@@ -182,6 +178,7 @@ extension ViewController: UICollectionViewDataSource {
         if chat.isGroupChat! {
             path = chat.groupIconPath!
             cell.lable1.text = chat.groupName
+            
         }else{
             
         let otherUser = chat.users[chat.otherUser!]
@@ -191,7 +188,6 @@ extension ViewController: UICollectionViewDataSource {
         StorageManager.shared.downloadImageWithPath(path: path) { image in
             cell.imageView.image = image
         }
-        
         
         return cell
     }
@@ -212,7 +208,7 @@ extension ViewController: UICollectionViewDataSource {
 extension ViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 100)
+        return CGSize(width: view.frame.width, height: 90)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -241,6 +237,7 @@ extension ViewController: MessageControllerDelegate {
         vc.chat = chat
         vc.hidesBottomBarWhenPushed = true
         vc.navigationItem.largeTitleDisplayMode = .never
+        
         navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -255,7 +252,5 @@ extension ViewController: GroupChatControllerDelegate {
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-    
 }
 

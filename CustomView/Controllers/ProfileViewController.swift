@@ -18,17 +18,39 @@ class ProfileViewController: UIViewController {
     let content = ["Logout"]
     var currentUser: UserData?
     
-    var username = CustomLabel(font: Font.fontBold1)
-    var email = CustomLabel(font: Font.fontBold1)
+//    var username = CustomLabel(font: Font.font3)
+//    var email = CustomLabel(font: Font.font3)
+    
+    var username: UILabel = {
+        
+        let label = UILabel()
+        label.font = UIFont(name: "PTSans-Regular", size: 17)
+        label.textColor = UIColor(red: 0.576, green: 0.612, blue: 0.631, alpha: 1)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    var email: UILabel = {
+        
+        let label = UILabel()
+        label.font = UIFont(name: "PTSans-Regular", size: 17)
+        label.textColor = UIColor(red: 0.576, green: 0.612, blue: 0.631, alpha: 1)
+        label.textAlignment = .center
+        return label
+    }()
+    
     //MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.layer.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1).cgColor
+        tableView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = createTableHeader()
         configure()
+        configureNavigationBar()
         fetchuser()
     }
     
@@ -52,8 +74,8 @@ class ProfileViewController: UIViewController {
         NSLayoutConstraint.activate([
         
             username.topAnchor.constraint(equalTo: imageView.bottomAnchor,constant: 10),
-            username.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 100),
-            username.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -100),
+            username.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 90),
+            username.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -90),
             
             email.topAnchor.constraint(equalTo: username.bottomAnchor, constant: 5),
             email.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 80),
@@ -67,18 +89,33 @@ class ProfileViewController: UIViewController {
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 300))
 //        headerView.backgroundColor = .green
         
-        imageView = UIImageView(frame: CGRect(x: (headerView.frame.width-150)/2, y: 75, width: 150, height: 150))
+        imageView = UIImageView(frame: CGRect(x: (headerView.frame.width-150)/2, y: 50, width: 150, height: 150))
         imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .white
-        imageView.layer.borderColor = UIColor.white.cgColor
+//        imageView.backgroundColor = .white
+        imageView.layer.borderColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1).cgColor
         imageView.layer.borderWidth = 3
         imageView.layer.cornerRadius = imageView.frame.width/2
         imageView.image = UIImage(systemName: "person.fill")
-        imageView.tintColor = .magenta
+        imageView.tintColor = UIColor(red: 0.616, green: 0.647, blue: 0.675, alpha: 1)
+        imageView.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
         imageView.layer.masksToBounds = true
         headerView.addSubview(imageView)
         
         return headerView
+    }
+    
+    func configureNavigationBar() {
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor(red: 0.616, green: 0.647, blue: 0.675, alpha: 1)]
+        appearance.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
+        navigationItem.title = "Profile"
+//        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        
     }
     
     func fetchuser(){
@@ -121,10 +158,11 @@ extension ProfileViewController:UITableViewDelegate, UITableViewDataSource {
         return content.count
     }
     
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = content[indexPath.row]
+        cell.textLabel?.textColor = .white
+        cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         return cell
     }
     

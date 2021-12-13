@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 class ImageCell: UITableViewCell {
     
@@ -44,7 +45,7 @@ class ImageCell: UITableViewCell {
     var time : UILabel = {
         
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = UIColor(red: 0.502, green: 0.702, blue: 0.682, alpha: 1)
         label.font = Font.font3
         label.textAlignment = .center
         
@@ -56,7 +57,7 @@ class ImageCell: UITableViewCell {
   
         let label = UILabel()
         
-        label.textColor = .blue
+        label.textColor = .orange
         label.font = Font.font
         label.textAlignment = .left
         label.text = ""
@@ -77,10 +78,10 @@ class ImageCell: UITableViewCell {
         messageImage.translatesAutoresizingMaskIntoConstraints = false
         sendersName.translatesAutoresizingMaskIntoConstraints = false
         
-        leftConstraint = view.leftAnchor.constraint(equalTo: leftAnchor, constant: 5)
-        rightConstraint = view.rightAnchor.constraint(equalTo: rightAnchor, constant: -5)
-        currentSenderTopConstraint = messageImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 10)
-        receiverMessageTopConstraint = messageImage.topAnchor.constraint(equalTo: sendersName.bottomAnchor, constant: 5)
+        leftConstraint = view.leftAnchor.constraint(equalTo: leftAnchor, constant: 32)
+        rightConstraint = view.rightAnchor.constraint(equalTo: rightAnchor, constant: -32)
+        currentSenderTopConstraint = messageImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 5)
+        receiverMessageTopConstraint = messageImage.topAnchor.constraint(equalTo: sendersName.bottomAnchor, constant: 2)
         senderNameTopConstraint = sendersName.topAnchor.constraint(equalTo: view.topAnchor, constant: 10)
         
         NSLayoutConstraint.activate([
@@ -120,7 +121,7 @@ class ImageCell: UITableViewCell {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm:a"
-        //        message.text = message1!.message
+        
         time.text = dateFormatter.string(from: message1!.time)
         
         StorageManager.shared.downloadImageWithPath(path: (message1?.imagePath!)!, completion: { image in
@@ -137,7 +138,9 @@ class ImageCell: UITableViewCell {
             currentSenderTopConstraint?.isActive = true
             leftConstraint?.isActive = false
             rightConstraint?.isActive = true
-            view.backgroundColor = .link
+            view.backgroundColor = UIColor(red: 0.02, green: 0.275, blue: 0.251, alpha: 1)
+            
+
             
         } else {
         
@@ -147,7 +150,7 @@ class ImageCell: UITableViewCell {
             senderNameTopConstraint?.isActive = true
             leftConstraint?.isActive = true
             rightConstraint?.isActive = false
-            view.backgroundColor = .magenta
+            view.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
             
         }
     }

@@ -12,7 +12,7 @@ class CustomButton: UIButton {
     
     init(setTitle: String) {
         super.init(frame: .zero)
-        backgroundColor = .link
+        backgroundColor = UIColor(red: 0.02, green: 0.275, blue: 0.251, alpha: 1)
         translatesAutoresizingMaskIntoConstraints = false
         heightAnchor.constraint(equalToConstant: 50).isActive = true
         layer.cornerRadius = 20
@@ -24,4 +24,5 @@ class CustomButton: UIButton {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
 }

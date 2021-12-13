@@ -12,6 +12,7 @@ class ForgotPasswordViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         configure()
         configureNotificationObserver()
     }
@@ -21,7 +22,7 @@ class ForgotPasswordViewController: UIViewController {
         let label = UILabel()
         
         label.text = "Reset Password"
-        label.textColor = .magenta
+        label.textColor = UIColor(red: 0.02, green: 0.275, blue: 0.251, alpha: 1)
         label.font = UIFont.boldSystemFont(ofSize: 40.0)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
@@ -29,14 +30,16 @@ class ForgotPasswordViewController: UIViewController {
     }()
     var resetPasswordButton = ButtonSetTitle.resetPassword
     var backToLoginButton = ButtonSetTitle.backToLogin
-    var emailTextField = CustomTextField(placeholder: Placeholder.email)
+    var emailTextField = CustomTextField(placeholder: "")
     let scrollView = UIScrollView()
     
     lazy var emailContainerView : InputContainerView = {
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocorrectionType = .no
         emailTextField.autocapitalizationType = .none
-        return InputContainerView(image: UIImage(systemName: "envelope")!, textField: emailTextField)
+        emailTextField.textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        emailTextField.attributedPlaceholder = NSAttributedString(string: Placeholder.email, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return InputContainerView(image: UIImage(systemName: "envelope")!, textField: emailTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
 
 }()
         
@@ -50,7 +53,7 @@ class ForgotPasswordViewController: UIViewController {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         stack.spacing = 10
         stack.axis = .vertical
-//        view.addSubview(stack)
+
         view.addSubview(scrollView)
         scrollView.addSubview(stack)
         scrollView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
@@ -59,16 +62,15 @@ class ForgotPasswordViewController: UIViewController {
         scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
         stack.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 150).isActive = true
-//        stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
-//        stack.rightAnchor.constraint(equalTo: view.rightAnchor,constant: -20).isActive = true
         stack.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
         stack .widthAnchor.constraint(equalToConstant: 350).isActive = true
         scrollView.contentSize = CGSize(width: view.frame.width, height: 600)
     }
     
     
-    @objc func didTapResetPassword() {
+    @objc func didTapResetPassword(sender: UIButton) {
         
+        sender.flash()
         Auth.auth().sendPasswordReset(withEmail: emailTextField.text!) {
             error in
             
@@ -87,7 +89,8 @@ class ForgotPasswordViewController: UIViewController {
     }
    
     
-    @objc func didTapBackToLogin() {
+    @objc func didTapBackToLogin(sender: UIButton) {
+        
         dismiss(animated: true, completion: nil)
     }
     

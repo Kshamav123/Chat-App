@@ -10,19 +10,20 @@ import UIKit
 
 class InputContainerView: UIView {
     
-    init(image: UIImage,textField: UITextField) {
+    init(image: UIImage,textField: UITextField, backgroundColor: UIColor?) {
         super.init(frame: .zero)
         
         heightAnchor.constraint(equalToConstant: 50).isActive = true
-        backgroundColor = .white
+//        backgroundColor = .white
+        self.backgroundColor = backgroundColor
         layer.cornerRadius = 10
-        layer.borderColor = UIColor.link.cgColor
+        layer.borderColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1).cgColor
         layer.borderWidth = 2
         
         let iv = UIImageView()
         addSubview(iv)
         iv.image = image
-        iv.tintColor = .magenta
+        iv.tintColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         iv.leftAnchor.constraint(equalTo: leftAnchor, constant: 10).isActive = true

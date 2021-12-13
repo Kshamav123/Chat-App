@@ -45,8 +45,8 @@ class ChatCell: UITableViewCell {
         
         view.layer.cornerRadius = 5
         
-        leftConstraint = view.leftAnchor.constraint(equalTo: leftAnchor, constant: 5)
-        rightConstraint = view.rightAnchor.constraint(equalTo: rightAnchor, constant: -5)
+        leftConstraint = view.leftAnchor.constraint(equalTo: leftAnchor, constant: 32)
+        rightConstraint = view.rightAnchor.constraint(equalTo: rightAnchor, constant: -32)
         currentSenderTopConstraint = message.topAnchor.constraint(equalTo: view.topAnchor, constant: 10)
         receiverMessageTopConstraint = message.topAnchor.constraint(equalTo: sendersName.bottomAnchor, constant: 5)
         senderNameTopConstraint = sendersName.topAnchor.constraint(equalTo: view.topAnchor, constant: 10)
@@ -60,17 +60,13 @@ class ChatCell: UITableViewCell {
             
             sendersName.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             sendersName.widthAnchor.constraint(equalToConstant: 80),
-            
-//            message.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+
             message.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
-//            message.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10),
-//            message.rightAnchor.constraint(equalTo: time.leftAnchor, constant: -10),
             
             time.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
-//            time.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             time.topAnchor.constraint(equalTo: message.bottomAnchor, constant: 5),
             time.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10),
-//            time.widthAnchor.constraint(equalToConstant: 90),
+
         ])
         
     }
@@ -86,8 +82,8 @@ class ChatCell: UITableViewCell {
         
         let label = UILabel()
         
-        label.textColor = .black
-        label.font = Font.font2
+        label.textColor = UIColor(red: 0.765, green: 0.867, blue: 0.863, alpha: 1)
+        label.font = UIFont(name: "PTSans-Regular", size: 16)
         label.textAlignment = .left
         label.numberOfLines = 0
         
@@ -97,7 +93,7 @@ class ChatCell: UITableViewCell {
     var time : UILabel = {
         
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = UIColor(red: 0.502, green: 0.702, blue: 0.682, alpha: 1)
         label.font = Font.font3
         label.textAlignment = .center
         
@@ -118,7 +114,7 @@ class ChatCell: UITableViewCell {
   
         let label = UILabel()
         
-        label.textColor = .blue
+        label.textColor = .orange
         label.font = Font.font
         label.textAlignment = .left
         label.text = " "
@@ -144,7 +140,9 @@ class ChatCell: UITableViewCell {
             currentSenderTopConstraint?.isActive = true
             leftConstraint?.isActive = false
             rightConstraint?.isActive = true
-            view.backgroundColor = .link
+            view.backgroundColor = UIColor(red: 0.02, green: 0.275, blue: 0.251, alpha: 1)
+            
+
             
         } else {
             
@@ -154,7 +152,7 @@ class ChatCell: UITableViewCell {
             senderNameTopConstraint?.isActive = true
             leftConstraint?.isActive = true
             rightConstraint?.isActive = false
-            view.backgroundColor = .magenta
+            view.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
             
         }
     }

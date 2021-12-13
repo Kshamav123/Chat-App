@@ -10,9 +10,9 @@ import UIKit
 
 struct Font {
     static let fontBold1 = UIFont.boldSystemFont(ofSize: 20)
-    static let font = UIFont.systemFont(ofSize: 16, weight: .heavy)
-    static let font1 = UIFont.systemFont(ofSize: 16)
-    static let font2 = UIFont.systemFont(ofSize: 16, weight: .medium)
+    static let font = UIFont(name: "PTSans-Regular", size: 21)
+    static let font1 = UIFont(name: "PTSans-Regular", size: 17)
+    static let font2 = UIFont(name: "PTSans-Bold", size: 12)
     static let font3 = UIFont.systemFont(ofSize: 12, weight: .light)
     static let font4 = UIFont.systemFont(ofSize: 10,weight: .light)
    
@@ -45,4 +45,8 @@ struct SystemImage {
     static let send = UIImage(systemName: "arrowtriangle.right.fill")
     static let addNewContact = UIImage(systemName: "person.badge.plus")
     static let photo = UIImage(systemName: "photo.artframe")
+     static let groupPhoto = UIImage(systemName: "person.3")
+    static let cancel = UIImage(systemName:"delete.backward.fill")
+//    let rotatedImage = groupPhoto.rotate(radians: .pi)
+//    groupPhoto.transform = ImageView.transform.rotated(by: .pi)
 }

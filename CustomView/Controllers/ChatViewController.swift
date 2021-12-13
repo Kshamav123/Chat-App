@@ -15,16 +15,30 @@ class ChatViewController: UITableViewController  {
     var messages = [Message]()
     var currentUser : UserData!
     var otherUser: UserData!
-    //    var chatId: String!
     let uid = DatabaseManager.shared.getUID()
+
     
-    let textField = CustomTextField(placeholder: Placeholder.message)
+    let textField: UITextField = {
+        
+        let textField = UITextField()
+        textField.font =  UIFont(name: "PTSans-Regular", size: 20)
+        textField.adjustsFontSizeToFitWidth = true
+        textField.minimumFontSize = 12
+        textField.autocorrectionType = .no
+        textField.textColor = .lightGray
+        textField.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
+        textField.layer.cornerRadius = 10
+        textField.attributedPlaceholder = NSAttributedString(string: "  Type a message", attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return textField
+        
+    }()
     
     let sendButton: UIButton = {
         let button = UIButton()
         button.setImage(SystemImage.send, for: .normal)
-        button.tintColor = .white
-        button.backgroundColor = .link
+        button.tintColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        
+        button.backgroundColor = UIColor(red: 7/255.0, green: 94/255.0, blue: 84/255.0, alpha: 1.0)
         button.layer.cornerRadius = 25
         button.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -35,8 +49,8 @@ class ChatViewController: UITableViewController  {
     let photoButton: UIButton = {
         let button = UIButton()
         button.setImage(SystemImage.photo, for: .normal)
-        button.tintColor = .white
-        button.backgroundColor = .link
+        button.tintColor = .lightGray
+        button.backgroundColor = UIColor(red: 7/255.0, green: 94/255.0, blue: 84/255.0, alpha: 1.0)
         button.layer.cornerRadius = 25
         button.addTarget(self, action: #selector(clickPhotoButton), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -48,9 +62,10 @@ class ChatViewController: UITableViewController  {
         let containerView = UIView()
         containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 60)
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .clear
+        containerView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+        
         let separatorLineView = UIView()
-        separatorLineView.backgroundColor = .tertiarySystemBackground
+        separatorLineView.backgroundColor = .black
         separatorLineView.translatesAutoresizingMaskIntoConstraints = false
         
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -96,7 +111,7 @@ class ChatViewController: UITableViewController  {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         
         configureTableView()
         configure()
@@ -233,7 +248,7 @@ class ChatViewController: UITableViewController  {
         
         if messages[indexPath.row].imagePath == "" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! ChatCell
-            
+            cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
             let messageItem : Message = messages[indexPath.row]
             cell.message1 = messageItem
             cell.message.text = messageItem.message
@@ -243,6 +258,7 @@ class ChatViewController: UITableViewController  {
         } else {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "Imagecell", for: indexPath) as! ImageCell
+            cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
             cell.message1 = messages[indexPath.row]
             cell.userList = chat.users
             StorageManager.shared.downloadImageWithPath(path: messages[indexPath.row].imagePath!, completion: { image in

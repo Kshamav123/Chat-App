@@ -27,24 +27,28 @@ class GroupChatViewController: UIViewController {
         
         let imageView = UIImageView()
         
-        imageView.tintColor = .magenta
+        imageView.tintColor = UIColor(red: 0.616, green: 0.647, blue: 0.675, alpha: 1)
         imageView.clipsToBounds = true
-        imageView.image = SystemImage.personImage
+        imageView.image = SystemImage.groupPhoto
         imageView.layer.cornerRadius = 40
         imageView.isUserInteractionEnabled = true
-        imageView.backgroundColor = .white
+        imageView.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
         
         return imageView
     }()
     
-    let groupNameTextField = CustomTextField(placeholder: "Enter the group name")
+    let groupNameTextField = CustomTextField(placeholder: "")
     
     lazy var groupNameContainer: InputContainerView = {
         
-        return InputContainerView(image: SystemImage.personImage!, textField: groupNameTextField)
+        groupNameTextField.textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        groupNameTextField.attributedPlaceholder = NSAttributedString(string: "Enter the group name", attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return InputContainerView(image: SystemImage.personImage!, textField: groupNameTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
         
     }()
+   
     override func viewDidLoad() {
+
         super.viewDidLoad()
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfilePic))
         groupPhoto.addGestureRecognizer(gesture)
@@ -54,7 +58,7 @@ class GroupChatViewController: UIViewController {
         configureNavigationBar()
         
     }
-    
+   
     func presentPhotoActionSheet() {
         
         let actionSheet = UIAlertController(title: "Profile Picture", message: "How will you select a picture", preferredStyle: .actionSheet)
@@ -68,13 +72,13 @@ class GroupChatViewController: UIViewController {
         present(actionSheet,animated: true)
         
     }
+    
     func presentPhotoPicker() {
         
         let vc = UIImagePickerController()
         vc.sourceType = .photoLibrary
         vc.delegate = self
         vc.allowsEditing = true
-        //        present(vc, animated: true)
         present(vc, animated: true, completion: nil)
         
     }
@@ -85,7 +89,8 @@ class GroupChatViewController: UIViewController {
         view.addSubview(groupNameContainer)
         view.addSubview(collectionView)
         
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+
         groupPhoto.translatesAutoresizingMaskIntoConstraints = false
         groupNameContainer.translatesAutoresizingMaskIntoConstraints = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -106,7 +111,6 @@ class GroupChatViewController: UIViewController {
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
-        
     }
     
     func configureCollectionView() {
@@ -116,8 +120,8 @@ class GroupChatViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(ConversationCell.self, forCellWithReuseIdentifier: "cell")
-        
-        
+        collectionView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+
     }
     
     func fetchAllUsers() {
@@ -146,17 +150,12 @@ class GroupChatViewController: UIViewController {
         DatabaseManager.shared.addChat1(users: usersList, id: chatID, isGroupChat: true, groupName: groupNameTextField.text, groupIconPath: groupPhotoPath)
         
         let vc = ChatViewController()
-//        vc.chat = Chats(users: usersList, lastMessage: nil, messages: [], chatId: chatID, isGroupChat: true, groupName: groupNameTextField.text, groupIconPath: groupPhotoPath)
-//        vc.hidesBottomBarWhenPushed = true
-//        vc.navigationItem.largeTitleDisplayMode = .never
-//        navigationController?.pushViewController(vc, animated: true)
         let chat = Chats(users: usersList, lastMessage: nil, messages: [], chatId: chatID, isGroupChat: true, groupName: groupNameTextField.text, groupIconPath: groupPhotoPath)
         delegate?.controllerGroup(wantsToStartChatWith: chat)
     }
     
     @objc func didTapProfilePic() {
         
-        print("image")
         presentPhotoActionSheet()
         
     }
@@ -169,10 +168,10 @@ class GroupChatViewController: UIViewController {
     func configureNavigationBar() {
         
         let createGroup = UIBarButtonItem(title: "Create", style: .done, target: self, action: #selector(handleCreateButton))
-//        navigationItem.rightBarButtonItems = [createGroup]
-//        let cancel = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelTapped))
+        
         let cancels = UIBarButtonItem(image: UIImage(systemName:"delete.backward.fill"), style: .done, target: self, action: #selector(cancelTapped))
         navigationItem.rightBarButtonItems = [cancels, createGroup]
+        navigationController?.navigationBar.tintColor = UIColor(red: 0.616, green: 0.647, blue: 0.675, alpha: 1)
     }
     
 }
@@ -206,7 +205,7 @@ extension GroupChatViewController: UICollectionViewDataSource, UICollectionViewD
         
         let user = users[indexPath.row]
         cell.lable1.text = user.username
-        cell.backgroundColor = .white
+        cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         cell.timelable.isHidden = true
         StorageManager.shared.downloadImageWithPath(path: "Profile/\(user.uid)") { image in
             cell.imageView.image = image
@@ -224,6 +223,7 @@ extension GroupChatViewController: UICollectionViewDataSource, UICollectionViewD
             selectedUsers.remove(at: selectedUsers.firstIndex(of: indexPath)!)
         }else {
             selectedUsers.append(indexPath)
+            selectedCell.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
         }
         
     }
@@ -232,14 +232,12 @@ extension GroupChatViewController: UICollectionViewDataSource, UICollectionViewD
 extension GroupChatViewController :UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 100)
+        return CGSize(width: view.frame.width, height: 80)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 2
     }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
-    }
+
     
 }
 

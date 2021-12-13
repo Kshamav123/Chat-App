@@ -29,13 +29,15 @@ class ConversationCell: UICollectionViewCell {
         imageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
         
         lable1.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 23).isActive = true
-        lable1.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 15).isActive = true
+        lable1.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 21).isActive = true
         
         lable2.topAnchor.constraint(equalTo: lable1.bottomAnchor, constant: 5).isActive = true
-        lable2.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 15).isActive = true
+        lable2.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 21).isActive = true
         
+        timelable.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         timelable.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        timelable.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
+//        timelable.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
+        timelable.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 332).isActive = true
     }
     
     required init?(coder: NSCoder) {
@@ -55,20 +57,55 @@ class ConversationCell: UICollectionViewCell {
 
     var imageView : UIImageView = {
         let images = UIImageView()
-        images.contentMode = .scaleAspectFit
+        images.contentMode = .scaleAspectFill
         images.image = UIImage(systemName: "person.fill")
-        images.layer.cornerRadius = 20
-//        images.backgroundColor = .blue
+        images.layer.cornerRadius = 23
+        images.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
+        images.tintColor = UIColor(red: 0.616, green: 0.647, blue: 0.675, alpha: 1)
         images.clipsToBounds = true
         return images
 
     }()
     
-    var lable1 = CustomLabel(font: Font.fontBold1)
-    var lable2 = CustomLabel(font: Font.font1)
-    var timelable = CustomLabel(font: Font.font3)
-    
+    var strokeView: UIView = {
+        
+        let stroke = UIView()
 
+        stroke.layer.borderWidth = 1
+        stroke.layer.borderColor = UIColor(red: 0.094, green: 0.145, blue: 0.176, alpha: 1).cgColor
+        return stroke
+    }()
+    
+//    var lable1 = CustomLabel(font: Font.font!)
+//    var lable2 = CustomLabel(font: Font.font3)
+//    var timelable = CustomLabel(font: Font.font3)
+    
+    var lable1: UILabel = {
+        
+        let label = UILabel()
+        label.font = UIFont(name: "PTSans-Regular", size: 21)
+        label.textColor = UIColor(red: 0.831, green: 0.863, blue: 0.875, alpha: 1)
+        return label
+    }()
+    
+    var lable2: UILabel = {
+        
+        let label = UILabel()
+        label.font = UIFont(name: "PTSans-Regular", size: 17)
+        label.textColor = UIColor(red: 0.576, green: 0.612, blue: 0.631, alpha: 1)
+        return label
+    }()
+    
+    var timelable: UILabel = {
+        
+        let label = UILabel()
+//        label.font = UIFont(name: "PTSans-Regular", size: 12)
+        label.font = Font.font3
+        label.textColor = UIColor(red: 0.525, green: 0.561, blue: 0.58, alpha: 1)
+//        label.widthAnchor.constraint(equalToConstant: 43).isActive = true
+//        label.heightAnchor.constraint(equalToConstant: 16).isActive = true
+        return label
+    }()
     
     @objc func tapSelectButton() {
         

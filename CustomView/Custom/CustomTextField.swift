@@ -16,11 +16,9 @@ class CustomTextField: UITextField {
         adjustsFontSizeToFitWidth = true
         minimumFontSize = 12
         autocorrectionType = .no
-        textColor = .black
-        backgroundColor = .white
-//        layer.cornerRadius = 10
-//        layer.borderColor = UIColor.darkGray.cgColor
-//        layer.borderWidth = 2
+        textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
+//        attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
         self.placeholder = placeholder
     }
     

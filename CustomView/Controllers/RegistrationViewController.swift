@@ -17,12 +17,11 @@ class RegistrationViewController: UIViewController {
         
         let imageView = UIImageView()
         
-        imageView.tintColor = .magenta
+        imageView.tintColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
         imageView.clipsToBounds = true
-//        imageView.image = UIImage(systemName: "person.fill")
         imageView.image = SystemImage.personImage
         imageView.layer.cornerRadius = 40
-        imageView.backgroundColor = .white
+        imageView.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
         
         return imageView
     }()
@@ -32,34 +31,39 @@ class RegistrationViewController: UIViewController {
     var emailTextField = CustomTextField(placeholder: Placeholder.email)
     var passwordTextField = CustomTextField(placeholder: Placeholder.password)
     var signUpButton1 = ButtonSetTitle.signUp
+    var backToLogin = ButtonSetTitle.backToLogin
     let scrollView = UIScrollView()
     
     lazy var firstNameContainer: InputContainerView = {
         firstNameTextField.keyboardType = .default
-
-        return InputContainerView(image: SystemImage.personImage!, textField: firstNameTextField)
+        firstNameTextField.textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        firstNameTextField.attributedPlaceholder = NSAttributedString(string: Placeholder.firstName, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return InputContainerView(image: SystemImage.personImage!, textField: firstNameTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
         
     }()
     
     lazy var lastNameContainer: InputContainerView = {
         lastNameTextField.keyboardType = .default
-
-        return InputContainerView(image: SystemImage.personImage!, textField: lastNameTextField)
+        lastNameTextField.textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        lastNameTextField.attributedPlaceholder = NSAttributedString(string: Placeholder.lastName, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return InputContainerView(image: SystemImage.personImage!, textField: lastNameTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
     }()
     
     lazy var emailContainer: InputContainerView = {
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocorrectionType = .no
         emailTextField.autocapitalizationType = .none
-
-        return InputContainerView(image: SystemImage.email!, textField: emailTextField)
+        emailTextField.textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        emailTextField.attributedPlaceholder = NSAttributedString(string: Placeholder.email, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return InputContainerView(image: SystemImage.email!, textField: emailTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
         
     }()
     
     lazy var passwordContainer: InputContainerView = {
         passwordTextField.isSecureTextEntry = true
-
-        return InputContainerView(image: SystemImage.password!, textField: passwordTextField)
+        passwordTextField.textColor = UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)
+        passwordTextField.attributedPlaceholder = NSAttributedString(string: Placeholder.password, attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.655, green: 0.675, blue: 0.69, alpha: 1)])
+        return InputContainerView(image: SystemImage.password!, textField: passwordTextField, backgroundColor: UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1))
     }()
     
     
@@ -67,7 +71,7 @@ class RegistrationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         configure()
                 configureNotificationObserver()
         //        createDismissKeyboardTapGesture()
@@ -84,7 +88,7 @@ class RegistrationViewController: UIViewController {
         presentPhotoActionSheet()
     }
     
-    @objc func handleSignUp(){
+    @objc func handleSignUp(sender: UIButton){
         
         let error = validateFields()
         
@@ -153,6 +157,11 @@ class RegistrationViewController: UIViewController {
         scrollView.contentSize = CGSize(width: view.frame.width, height: 600)
     }
     
+    @objc func handlebackToLogin(){
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
     //MARK: Helpers
     
     func createDismissKeyboardTapGesture(){
@@ -180,7 +189,7 @@ class RegistrationViewController: UIViewController {
     func configure() {
         
         signUpButton1.addTarget(self, action: #selector(handleSignUp), for: .touchUpInside)
-        
+        backToLogin.addTarget(self, action: #selector(handlebackToLogin), for: .touchUpInside)
 //        view.addSubview(photButton)
         
         let stack = UIStackView(arrangedSubviews: [firstNameContainer,lastNameContainer,emailContainer,passwordContainer,signUpButton1])
@@ -206,8 +215,6 @@ class RegistrationViewController: UIViewController {
         photButton.widthAnchor.constraint(equalToConstant: 120).isActive = true
         
         stack.topAnchor.constraint(equalTo: photButton.bottomAnchor, constant: 80).isActive = true
-//        stack.leftAnchor.constraint(equalTo: scrollView.leftAnchor, constant: 20).isActive = true
-//        stack.rightAnchor.constraint(equalTo: scrollView.rightAnchor,constant: -20).isActive = true
         stack.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
         stack .widthAnchor.constraint(equalToConstant: 350).isActive = true
         scrollView.contentSize = CGSize(width: view.frame.width, height: 600)
